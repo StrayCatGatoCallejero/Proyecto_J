@@ -1,17 +1,17 @@
-# 🔢 Procesamiento Estadístico + Frontend
+#  Procesamiento Estadístico + Frontend
 
 Una aplicación web completa para análisis estadístico de archivos `.sav` y `.dta` con interfaz moderna y funcionalidades avanzadas.
 
-## 🚀 Características Principales
+##  Características Principales
 
-### 📊 **Análisis Estadístico Completo**
+### **Análisis Estadístico Completo**
 - **Estadísticas Descriptivas**: Media, mediana, moda, percentiles, desviación estándar
 - **Análisis de Correlaciones**: Matrices de correlación Pearson y Spearman con heatmaps
 - **Tablas de Contingencia**: Análisis χ² con interpretaciones detalladas
 - **Visualizaciones Avanzadas**: Boxplots, scatter plots, diagramas de densidad y más
 - **Ciencias Sociales**: Análisis especializado para investigación social y demográfica
 
-### 🎓 **Análisis para Ciencias Sociales**
+###  **Análisis para Ciencias Sociales**
 - **Clasificación Automática**: Detección automática del tipo y dominio de variables
 - **Análisis Descriptivo Especializado**: Interpretación específica para variables sociales
 - **Análisis Bivariado Avanzado**: Correlaciones, contingencia y diferencias de medias
@@ -20,30 +20,30 @@ Una aplicación web completa para análisis estadístico de archivos `.sav` y `.
 - **Índices Especializados**: Gini, calidad de vida, desarrollo humano
 - **Manejo de Valores Perdidos**: Análisis de patrones y sugerencias de imputación
 
-### 🔍 **Filtros Dinámicos**
+###  **Filtros Dinámicos**
 - **Filtros por Rango**: Sliders para variables numéricas
 - **Filtros por Categoría**: Multiselect para variables categóricas
 - **Aplicación Global**: Los filtros se aplican a todos los análisis
 - **Vista Previa**: Resumen de datos filtrados en tiempo real
 
-### 📊 **Visualizaciones Avanzadas**
-- **📦 Boxplots**: Distribución de variables numéricas con opción de agrupación
-- **🔄 Scatter Plots**: Relaciones entre variables con líneas de regresión
-- **📈 Diagramas de Densidad**: Distribuciones de probabilidad
-- **📊 Histogramas con Densidad**: Combinación de histograma y curva de densidad
-- **🎻 Violin Plots**: Distribuciones completas por grupos
-- **📊 Gráficos de Barras**: Frecuencias y promedios
-- **🔥 Heatmaps Avanzados**: Correlaciones con análisis adicional
-- **🔗 Matrices de Scatter Plots**: Visualización de múltiples relaciones
-- **📊 Paneles Completos**: Múltiples visualizaciones en una sola vista
+###  **Visualizaciones Avanzadas**
+- **Boxplots**: Distribución de variables numéricas con opción de agrupación
+- **Scatter Plots**: Relaciones entre variables con líneas de regresión
+- **Diagramas de Densidad**: Distribuciones de probabilidad
+- **Histogramas con Densidad**: Combinación de histograma y curva de densidad
+- **Violin Plots**: Distribuciones completas por grupos
+- **Gráficos de Barras**: Frecuencias y promedios
+- **Heatmaps Avanzados**: Correlaciones con análisis adicional
+- **Matrices de Scatter Plots**: Visualización de múltiples relaciones
+- **Paneles Completos**: Múltiples visualizaciones en una sola vista
 
-### 📤 **Exportación Profesional**
+### **Exportación Profesional**
 - **Formatos Múltiples**: CSV, Excel, HTML
 - **Reportes Completos**: Todos los análisis en un solo archivo
 - **Datos Filtrados**: Exportación de conjuntos de datos personalizados
 - **Interpretaciones**: Guías y explicaciones incluidas
 
-## 🛠️ Instalación
+## Instalación
 
 1. **Clona el repositorio**:
 ```bash
@@ -61,7 +61,7 @@ pip install -r requirements.txt
 streamlit run app_front.py
 ```
 
-## 📋 Dependencias
+##  Dependencias
 
 ```
 streamlit>=1.28.0
@@ -75,7 +75,7 @@ pyreadstat>=1.1.0
 openpyxl>=3.1.0
 ```
 
-## 🎯 Uso de la Aplicación
+##  Uso de la Aplicación
 
 ### 1. **Carga de Datos**
 - Sube archivos `.sav` (SPSS) o `.dta` (Stata)
@@ -90,24 +90,24 @@ openpyxl>=3.1.0
 
 ### 3. **Análisis Estadístico**
 
-#### 📈 **Estadísticas Básicas**
+####  **Estadísticas Básicas**
 - Selecciona variables numéricas
 - Obtén estadísticas descriptivas completas
 - Visualiza histogramas automáticamente
 
-#### 🔗 **Análisis de Correlaciones**
+####  **Análisis de Correlaciones**
 - Selecciona múltiples variables numéricas
 - Elige entre correlación Pearson o Spearman
 - Visualiza matrices con heatmaps interactivos
 - Interpreta la fuerza de las correlaciones
 
-#### 📊 **Tablas de Contingencia**
+####  **Tablas de Contingencia**
 - Selecciona dos variables categóricas
 - Obtén tablas de contingencia completas
 - Realiza pruebas χ² de independencia
 - Interpreta resultados con guías detalladas
 
-#### 📊 **Visualizaciones Avanzadas**
+####  **Visualizaciones Avanzadas**
 - **Panel Completo**: Múltiples gráficos para una variable
 - **Boxplots**: Distribución y outliers
 - **Scatter Plots**: Relaciones con líneas de regresión
@@ -119,64 +119,64 @@ openpyxl>=3.1.0
 
 ### 4. **Exportación de Resultados**
 
-#### 📄 **Exportación Individual**
+####  **Exportación Individual**
 - **CSV**: Datos y resultados en formato tabular
 - **Excel**: Múltiples hojas organizadas
 - **HTML**: Reportes formateados profesionalmente
 
-#### 📊 **Reportes Completos**
+####  **Reportes Completos**
 - **Excel Completo**: Todas las hojas en un archivo
 - **HTML Completo**: Reporte profesional con interpretaciones
 - **Datos Filtrados**: Conjuntos personalizados
 
-## 📊 Tipos de Visualizaciones Disponibles
+##  Tipos de Visualizaciones Disponibles
 
-### 📦 **Boxplots**
+###  **Boxplots**
 - **Uso**: Visualizar distribución y detectar outliers
 - **Opciones**: Simple o agrupado por variable categórica
 - **Información**: Mediana, cuartiles, valores atípicos
 
-### 🔄 **Scatter Plots**
+###  **Scatter Plots**
 - **Uso**: Analizar relaciones entre variables numéricas
 - **Características**: Líneas de regresión automáticas
 - **Opciones**: Coloreado por variable categórica
 
-### 📈 **Diagramas de Densidad**
+###  **Diagramas de Densidad**
 - **Uso**: Visualizar distribuciones de probabilidad
 - **Ventajas**: No dependen del número de bins
 - **Opciones**: Agrupación por variables categóricas
 
-### 📊 **Histogramas con Densidad**
+###  **Histogramas con Densidad**
 - **Uso**: Combinar histograma y curva de densidad
 - **Beneficios**: Información completa de la distribución
 - **Aplicaciones**: Análisis de normalidad
 
-### 🎻 **Violin Plots**
+###  **Violin Plots**
 - **Uso**: Comparar distribuciones entre grupos
 - **Ventajas**: Muestra la forma completa de la distribución
 - **Aplicaciones**: Análisis por grupos categóricos
 
-### 📊 **Gráficos de Barras**
+###  **Gráficos de Barras**
 - **Uso**: Visualizar frecuencias y promedios
 - **Tipos**: Frecuencias simples o promedios por grupo
 - **Aplicaciones**: Análisis de variables categóricas
 
-### 🔥 **Heatmaps de Correlación Avanzados**
+###  **Heatmaps de Correlación Avanzados**
 - **Uso**: Análisis completo de correlaciones
 - **Características**: Matriz + gráfico de correlaciones más fuertes
 - **Información**: Top 10 correlaciones destacadas
 
-### 🔗 **Matrices de Scatter Plots**
+###  **Matrices de Scatter Plots**
 - **Uso**: Visualizar todas las relaciones entre variables
 - **Límite**: Hasta 6 variables para claridad
 - **Incluye**: Diagramas de densidad en la diagonal
 
-### 📊 **Paneles Completos**
+###  **Paneles Completos**
 - **Uso**: Análisis exhaustivo de una variable
 - **Contenido**: 4 visualizaciones diferentes
 - **Opciones**: Con o sin agrupación
 
-## 🔧 Características Técnicas
+##  Características Técnicas
 
 ### **Gestión de Estado**
 - **Session State**: Filtros persistentes entre secciones
@@ -201,7 +201,7 @@ openpyxl>=3.1.0
 - **Memoria**: Gestión optimizada de datos grandes
 - **Interfaz**: Carga progresiva de componentes
 
-## 📈 Interpretación de Resultados
+##  Interpretación de Resultados
 
 ### **Correlaciones**
 - **0.7-1.0**: Muy fuerte positiva
@@ -226,7 +226,7 @@ openpyxl>=3.1.0
 - **0.3-0.5**: Efecto moderado
 - **> 0.5**: Efecto grande
 
-## 🎨 Personalización
+##  Personalización
 
 ### **Configuración de Gráficos**
 - **Tamaños**: Automáticos según tipo de visualización
@@ -238,7 +238,7 @@ openpyxl>=3.1.0
 - **Contenido**: Personalizable por sección
 - **Calidad**: Alta resolución para gráficos
 
-## 🚀 Próximas Mejoras
+##  Próximas Mejoras
 
 - [ ] **Gráficos Interactivos**: Plotly para zoom y hover
 - [ ] **Análisis de Series Temporales**: Para datos longitudinales
@@ -248,7 +248,7 @@ openpyxl>=3.1.0
 - [ ] **Base de Datos**: Almacenamiento de análisis previos
 - [ ] **Colaboración**: Compartir análisis entre usuarios
 
-## 🤝 Contribuciones
+##  Contribuciones
 
 Las contribuciones son bienvenidas. Por favor:
 
@@ -258,11 +258,11 @@ Las contribuciones son bienvenidas. Por favor:
 4. Push a la rama
 5. Abre un Pull Request
 
-## 📄 Licencia
+##  Licencia
 
 Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## 📞 Soporte
+##  Soporte
 
 Para soporte técnico o preguntas:
 - Abre un issue en GitHub
@@ -273,7 +273,7 @@ Para soporte técnico o preguntas:
 
 **Desarrollado con ❤️ para la comunidad estadística**
 
-## 🎓 Análisis para Ciencias Sociales
+##  Análisis para Ciencias Sociales
 
 ### **Variables Demográficas**
 - **Edad**: Análisis por rangos etarios y generaciones

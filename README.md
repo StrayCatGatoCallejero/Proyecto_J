@@ -173,6 +173,14 @@ openpyxl>=3.1.0
 - **Datos de Análisis**: Resultados guardados para exportación
 - **Interfaz Reactiva**: Actualizaciones automáticas
 
+### **Persistencia de Sesiones**
+- **Datos Cargados**: Los archivos permanecen cargados entre recargas
+- **Filtros Aplicados**: Configuraciones de filtros se mantienen
+- **Selecciones de Usuario**: Variables y configuraciones persistentes
+- **Análisis Realizados**: Resultados guardados para exportación
+- **Navegación**: Estado mantenido al cambiar entre secciones
+- **Limpieza de Sesión**: Botón para reiniciar completamente la aplicación
+
 ### **Validaciones**
 - **Formato de Archivos**: Verificación automática
 - **Variables Disponibles**: Detección de tipos de datos

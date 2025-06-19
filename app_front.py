@@ -36,6 +36,20 @@ from estadistica.estadistica import (
     generar_panel_visualizaciones,
     generar_scatter_matrix
 )
+from estadistica.ciencias_sociales import (
+    clasificar_variable,
+    analisis_descriptivo_cs,
+    analisis_bivariado_cs,
+    analisis_regresion_multiple_cs,
+    analisis_clusters_cs,
+    calcular_indice_gini,
+    calcular_indice_gini_simple,
+    calcular_indice_calidad_vida,
+    calcular_indice_calidad_vida_simple,
+    validar_supuestos_regresion,
+    analizar_valores_perdidos,
+    sugerir_imputacion
+)
 
 st.set_page_config(page_title="🔢 Estadísticas Ninja", layout="wide")
 st.title("🔢 Procesamiento Estadístico + Frontend")
@@ -78,11 +92,24 @@ if 'variable_visualizacion' not in st.session_state:
 if 'variable_grupo_visualizacion' not in st.session_state:
     st.session_state['variable_grupo_visualizacion'] = None
 
+# Variables para ciencias sociales
+if 'analisis_cs_variable' not in st.session_state:
+    st.session_state['analisis_cs_variable'] = None
+
+if 'analisis_cs_variables_bivariado' not in st.session_state:
+    st.session_state['analisis_cs_variables_bivariado'] = []
+
+if 'analisis_cs_variables_regresion' not in st.session_state:
+    st.session_state['analisis_cs_variables_regresion'] = []
+
+if 'analisis_cs_variables_clusters' not in st.session_state:
+    st.session_state['analisis_cs_variables_clusters'] = []
+
 # Sidebar para navegación
 st.sidebar.title("📊 Navegación")
 pagina = st.sidebar.selectbox(
     "Selecciona la sección:",
-    ["🔍 Filtros", "📈 Estadísticas Básicas", "🔗 Análisis de Correlaciones", "📊 Tablas de Contingencia", "📊 Visualizaciones Avanzadas", "📤 Exportar Resultados"]
+    ["🔍 Filtros", "📈 Estadísticas Básicas", "🔗 Análisis de Correlaciones", "📊 Tablas de Contingencia", "📊 Visualizaciones Avanzadas", "🎓 Ciencias Sociales", "📤 Exportar Resultados"]
 )
 
 # ============================================================================
@@ -918,6 +945,331 @@ if df is not None:
                             st.pyplot(fig_scatter_matrix)
                     else:
                         st.warning("⚠️ Selecciona al menos 2 variables para continuar.")
+    
+    elif pagina == "🎓 Ciencias Sociales":
+        st.header("🎓 Análisis Estadístico para Ciencias Sociales")
+        st.write("Herramientas especializadas para investigación en ciencias sociales, demografía y estudios sociales.")
+        
+        # Aplicar filtros si existen
+        if st.session_state['filtros_aplicados']:
+            df_analisis = aplicar_filtros(df, st.session_state['filtros_aplicados'])
+            stats_filtradas = obtener_estadisticas_filtradas(df, st.session_state['filtros_aplicados'])
+            
+            st.info(f"📊 Analizando {stats_filtradas['n_filtrado']} de {stats_filtradas['n_original']} observaciones ({stats_filtradas['porcentaje_muestra']:.1f}% de la muestra)")
+        else:
+            df_analisis = df
+            st.info("📊 Analizando todos los datos (sin filtros aplicados)")
+        
+        # Tabs para diferentes tipos de análisis
+        tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+            "🔍 Clasificación Variables", 
+            "📊 Análisis Descriptivo", 
+            "🔗 Análisis Bivariado", 
+            "📈 Regresión Múltiple", 
+            "🎯 Clustering", 
+            "📋 Valores Perdidos"
+        ])
+        
+        with tab1:
+            st.subheader("🔍 Clasificación Automática de Variables")
+            st.write("Clasifica automáticamente las variables según su tipo y dominio en ciencias sociales.")
+            
+            # Mostrar clasificación de todas las variables
+            clasificaciones = []
+            for col in df_analisis.columns:
+                clasificacion = clasificar_variable(df_analisis, col)
+                clasificaciones.append(clasificacion)
+            
+            # Crear DataFrame con clasificaciones
+            df_clasificaciones = pd.DataFrame(clasificaciones)
+            
+            # Mostrar tabla de clasificaciones
+            st.dataframe(df_clasificaciones[['columna', 'dominio', 'es_continua', 'es_categorica', 'es_ordinal', 'n_unicos', 'porcentaje_faltantes']])
+            
+            # Filtros por dominio
+            dominios_unicos = df_clasificaciones['dominio'].unique()
+            dominio_seleccionado = st.selectbox("🔍 Filtrar por dominio:", ['Todos'] + list(dominios_unicos))
+            
+            if dominio_seleccionado != 'Todos':
+                df_filtrado = df_clasificaciones[df_clasificaciones['dominio'] == dominio_seleccionado]
+                st.write(f"**Variables del dominio: {dominio_seleccionado}**")
+                st.dataframe(df_filtrado[['columna', 'es_continua', 'es_categorica', 'es_ordinal', 'n_unicos', 'porcentaje_faltantes']])
+        
+        with tab2:
+            st.subheader("📊 Análisis Descriptivo Especializado")
+            st.write("Análisis descriptivo con interpretación específica para ciencias sociales.")
+            
+            # Selección de variable
+            variable_default = st.session_state['analisis_cs_variable'] if st.session_state['analisis_cs_variable'] in df_analisis.columns else df_analisis.columns[0]
+            variable = st.selectbox("🔍 Selecciona la variable:", df_analisis.columns, index=list(df_analisis.columns).index(variable_default))
+            
+            # Guardar la selección
+            st.session_state['analisis_cs_variable'] = variable
+            
+            if st.button("📊 Realizar Análisis Descriptivo"):
+                with st.spinner("Analizando variable..."):
+                    resultado = analisis_descriptivo_cs(df_analisis, variable)
+                
+                # Mostrar resultados
+                col1, col2 = st.columns(2)
+                
+                with col1:
+                    st.write("**📋 Clasificación de la Variable**")
+                    clasif = resultado['clasificacion']
+                    st.write(f"• **Dominio:** {clasif['dominio']}")
+                    st.write(f"• **Tipo:** {'Continua' if clasif['es_continua'] else 'Categórica'}")
+                    st.write(f"• **Observaciones:** {clasif['n_total']}")
+                    st.write(f"• **Valores únicos:** {clasif['n_unicos']}")
+                    st.write(f"• **Valores faltantes:** {clasif['valores_faltantes']} ({clasif['porcentaje_faltantes']:.1f}%)")
+                
+                with col2:
+                    st.write("**📈 Estadísticas Básicas**")
+                    stats = resultado['estadisticas_basicas']
+                    if clasif['es_continua']:
+                        st.write(f"• **Media:** {stats['media']:.2f}")
+                        st.write(f"• **Mediana:** {stats['mediana']:.2f}")
+                        st.write(f"• **Desv. Estándar:** {stats['desv_estandar']:.2f}")
+                        st.write(f"• **Rango:** {stats['minimo']:.2f} - {stats['maximo']:.2f}")
+                        st.write(f"• **Asimetría:** {stats['asimetria']:.3f}")
+                    else:
+                        st.write(f"• **Moda:** {stats['moda']}")
+                        st.write(f"• **Categorías:** {stats['n_categorias']}")
+                        st.write(f"• **Índice de diversidad:** {stats['indice_diversidad']:.3f}")
+                
+                # Interpretación
+                st.write("**📝 Interpretación**")
+                for key, value in resultado['interpretacion'].items():
+                    st.write(f"• **{key.replace('_', ' ').title()}:** {value}")
+                
+                # Guardar en session_state para exportación
+                st.session_state['datos_analisis']['analisis_descriptivo_cs'] = resultado
+        
+        with tab3:
+            st.subheader("🔗 Análisis Bivariado Especializado")
+            st.write("Análisis de relaciones entre dos variables con interpretación para ciencias sociales.")
+            
+            # Selección de variables
+            col1, col2 = st.columns(2)
+            with col1:
+                var1 = st.selectbox("🔍 Primera variable:", df_analisis.columns, index=0)
+            with col2:
+                var2 = st.selectbox("🔍 Segunda variable:", [col for col in df_analisis.columns if col != var1], index=0)
+            
+            # Guardar selecciones
+            st.session_state['analisis_cs_variables_bivariado'] = [var1, var2]
+            
+            if st.button("🔗 Realizar Análisis Bivariado"):
+                with st.spinner("Analizando relación entre variables..."):
+                    resultado = analisis_bivariado_cs(df_analisis, var1, var2)
+                
+                # Mostrar resultados
+                st.write(f"**📊 Análisis entre {var1} y {var2}**")
+                st.write(f"• **Observaciones válidas:** {resultado['n_observaciones']}")
+                
+                # Mostrar análisis específico
+                if 'correlacion_continua' in resultado['analisis']:
+                    analisis = resultado['analisis']
+                    st.write("**📈 Correlaciones**")
+                    
+                    col1, col2, col3 = st.columns(3)
+                    with col1:
+                        st.write("**Pearson:**")
+                        st.write(f"• r = {analisis['pearson']['coeficiente']:.3f}")
+                        st.write(f"• p = {analisis['pearson']['p_valor']:.3f}")
+                        st.write(f"• {analisis['pearson']['fuerza']}")
+                    
+                    with col2:
+                        st.write("**Spearman:**")
+                        st.write(f"• ρ = {analisis['spearman']['coeficiente']:.3f}")
+                        st.write(f"• p = {analisis['spearman']['p_valor']:.3f}")
+                        st.write(f"• {analisis['spearman']['fuerza']}")
+                    
+                    with col3:
+                        st.write("**Kendall:**")
+                        st.write(f"• τ = {analisis['kendall']['coeficiente']:.3f}")
+                        st.write(f"• p = {analisis['kendall']['p_valor']:.3f}")
+                        st.write(f"• {analisis['kendall']['fuerza']}")
+                
+                elif 'contingencia_categorica' in resultado['analisis']:
+                    analisis = resultado['analisis']
+                    st.write("**📊 Tabla de Contingencia**")
+                    
+                    # Mostrar tabla
+                    tabla = pd.DataFrame(analisis['tabla_contingencia'])
+                    st.dataframe(tabla)
+                    
+                    st.write("**🔬 Prueba Chi-cuadrado**")
+                    chi2 = analisis['chi_cuadrado']
+                    st.write(f"• **χ² = {chi2['estadistico']:.3f}**")
+                    st.write(f"• **p-valor = {chi2['p_valor']:.3f}**")
+                    st.write(f"• **Grados de libertad = {chi2['grados_libertad']}**")
+                    st.write(f"• **Cramer's V = {analisis['cramer_v']:.3f}**")
+                
+                elif 'grupos_continua' in resultado['analisis']:
+                    analisis = resultado['analisis']
+                    st.write("**📊 Análisis por Grupos**")
+                    
+                    # Mostrar estadísticas por grupo
+                    for grupo, stats in analisis['estadisticas_grupos'].items():
+                        st.write(f"**{grupo}:** n={stats['n']}, Media={stats['media']:.2f}, DE={stats['desv_estandar']:.2f}")
+                    
+                    st.write("**🔬 ANOVA**")
+                    anova = analisis['anova']
+                    st.write(f"• **F = {anova['f_statistico']:.3f}**")
+                    st.write(f"• **p-valor = {anova['p_valor']:.3f}**")
+                
+                # Interpretación
+                st.write("**📝 Interpretación**")
+                for key, value in resultado['interpretacion'].items():
+                    st.write(f"• **{key.replace('_', ' ').title()}:** {value}")
+                
+                # Guardar en session_state para exportación
+                st.session_state['datos_analisis']['analisis_bivariado_cs'] = resultado
+        
+        with tab4:
+            st.subheader("📈 Regresión Múltiple")
+            st.write("Análisis de regresión múltiple con validación de supuestos.")
+            
+            # Selección de variables
+            variable_dependiente = st.selectbox("🎯 Variable dependiente:", df_analisis.columns, index=0)
+            
+            variables_independientes = st.multiselect(
+                "📊 Variables independientes:",
+                [col for col in df_analisis.columns if col != variable_dependiente],
+                default=st.session_state['analisis_cs_variables_regresion']
+            )
+            
+            # Guardar selecciones
+            st.session_state['analisis_cs_variables_regresion'] = variables_independientes
+            
+            if len(variables_independientes) >= 1:
+                if st.button("📈 Realizar Regresión Múltiple"):
+                    with st.spinner("Calculando regresión múltiple..."):
+                        resultado = analisis_regresion_multiple_cs(df_analisis, variable_dependiente, variables_independientes)
+                    
+                    if 'error' not in resultado:
+                        # Mostrar resultados
+                        st.write("**📊 Resultados del Modelo**")
+                        st.write(f"• **R² = {resultado['r_cuadrado']:.3f}**")
+                        st.write(f"• **R² ajustado = {resultado['r_cuadrado_ajustado']:.3f}**")
+                        st.write(f"• **Observaciones = {resultado['n_observaciones']}**")
+                        st.write(f"• **Variables = {resultado['n_variables']}**")
+                        
+                        st.write("**📈 Coeficientes**")
+                        for var, coef in resultado['coeficientes'].items():
+                            st.write(f"• **{var}:** {coef['coeficiente']:.3f} (estandarizado: {coef['coeficiente_estandarizado']:.3f})")
+                        
+                        # Validación de supuestos
+                        st.write("**🔬 Validación de Supuestos**")
+                        supuestos = validar_supuestos_regresion(df_analisis, variable_dependiente, variables_independientes)
+                        
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.write("**Normalidad de residuos:**")
+                            norm = supuestos['normalidad_residuos']
+                            st.write(f"• p-valor = {norm['p_valor']:.3f}")
+                            st.write(f"• Cumple: {'✅' if norm['cumple_supuesto'] else '❌'}")
+                        
+                        with col2:
+                            st.write("**Homocedasticidad:**")
+                            hom = supuestos['homocedasticidad']
+                            if hom['p_valor'] is not None:
+                                st.write(f"• p-valor = {hom['p_valor']:.3f}")
+                                st.write(f"• Cumple: {'✅' if hom['cumple_supuesto'] else '❌'}")
+                            else:
+                                st.write("• No se pudo calcular")
+                        
+                        # Guardar en session_state para exportación
+                        st.session_state['datos_analisis']['regresion_multiple_cs'] = resultado
+                        st.session_state['datos_analisis']['supuestos_regresion'] = supuestos
+                    else:
+                        st.error(f"❌ Error: {resultado['error']}")
+            else:
+                st.warning("⚠️ Selecciona al menos una variable independiente.")
+        
+        with tab5:
+            st.subheader("🎯 Análisis de Clusters")
+            st.write("Análisis de conglomerados para identificar grupos en los datos.")
+            
+            # Selección de variables
+            variables_clusters = st.multiselect(
+                "📊 Variables para clustering:",
+                df_analisis.columns,
+                default=st.session_state['analisis_cs_variables_clusters']
+            )
+            
+            # Número de clusters
+            n_clusters = st.slider("🎯 Número de clusters:", 2, 10, 3)
+            
+            # Guardar selecciones
+            st.session_state['analisis_cs_variables_clusters'] = variables_clusters
+            
+            if len(variables_clusters) >= 2:
+                if st.button("🎯 Realizar Clustering"):
+                    with st.spinner("Calculando clusters..."):
+                        resultado = analisis_clusters_cs(df_analisis, variables_clusters, n_clusters)
+                    
+                    if 'error' not in resultado:
+                        # Mostrar resultados
+                        st.write("**📊 Resultados del Clustering**")
+                        st.write(f"• **Número de clusters:** {resultado['n_clusters']}")
+                        st.write(f"• **Observaciones:** {resultado['n_observaciones']}")
+                        st.write(f"• **Inercia:** {resultado['inercia']:.2f}")
+                        
+                        st.write("**📈 Distribución de Clusters**")
+                        for cluster, stats in resultado['estadisticas_clusters'].items():
+                            st.write(f"• **{cluster}:** {stats['n']} observaciones ({stats['porcentaje']:.1f}%)")
+                        
+                        # Mostrar características de cada cluster
+                        st.write("**🔍 Características por Cluster**")
+                        for cluster, stats in resultado['estadisticas_clusters'].items():
+                            st.write(f"**{cluster}:**")
+                            for var in variables_clusters:
+                                if f'media_{var}' in stats:
+                                    st.write(f"  • {var}: {stats[f'media_{var}']:.2f}")
+                        
+                        # Guardar en session_state para exportación
+                        st.session_state['datos_analisis']['clustering_cs'] = resultado
+                    else:
+                        st.error(f"❌ Error: {resultado['error']}")
+            else:
+                st.warning("⚠️ Selecciona al menos 2 variables para el clustering.")
+        
+        with tab6:
+            st.subheader("📋 Análisis de Valores Perdidos")
+            st.write("Análisis de patrones de valores perdidos y sugerencias de imputación.")
+            
+            # Análisis general de valores perdidos
+            if st.button("📋 Analizar Valores Perdidos"):
+                with st.spinner("Analizando valores perdidos..."):
+                    resultado = analizar_valores_perdidos(df_analisis)
+                
+                # Mostrar resultados generales
+                st.write("**📊 Resumen de Valores Perdidos**")
+                st.write(f"• **Total de valores perdidos:** {resultado['total_valores_perdidos']}")
+                st.write(f"• **Porcentaje total perdido:** {resultado['porcentaje_total_perdidos']:.1f}%")
+                
+                # Mostrar variables con valores perdidos
+                st.write("**📈 Variables con Valores Perdidos**")
+                df_perdidos = pd.DataFrame({
+                    'Variable': list(resultado['conteo_por_variable'].keys()),
+                    'Valores Perdidos': list(resultado['conteo_por_variable'].values()),
+                    'Porcentaje': list(resultado['porcentajes_por_variable'].values())
+                })
+                df_perdidos = df_perdidos[df_perdidos['Valores Perdidos'] > 0].sort_values('Valores Perdidos', ascending=False)
+                st.dataframe(df_perdidos)
+                
+                # Sugerencias de imputación
+                st.write("**💡 Sugerencias de Imputación**")
+                for var in df_perdidos['Variable']:
+                    sugerencia = sugerir_imputacion(df_analisis, var)
+                    st.write(f"**{var}:**")
+                    st.write(f"  • Métodos recomendados: {', '.join(sugerencia['metodos_recomendados'])}")
+                    if 'advertencia' in sugerencia:
+                        st.write(f"  • ⚠️ {sugerencia['advertencia']}")
+                
+                # Guardar en session_state para exportación
+                st.session_state['datos_analisis']['valores_perdidos'] = resultado
     
     elif pagina == "📤 Exportar Resultados":
         st.header("📤 Exportar Resultados Completos")

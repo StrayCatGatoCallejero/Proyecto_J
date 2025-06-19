@@ -9,6 +9,16 @@ Una aplicación web completa para análisis estadístico de archivos `.sav` y `.
 - **Análisis de Correlaciones**: Matrices de correlación Pearson y Spearman con heatmaps
 - **Tablas de Contingencia**: Análisis χ² con interpretaciones detalladas
 - **Visualizaciones Avanzadas**: Boxplots, scatter plots, diagramas de densidad y más
+- **Ciencias Sociales**: Análisis especializado para investigación social y demográfica
+
+### 🎓 **Análisis para Ciencias Sociales**
+- **Clasificación Automática**: Detección automática del tipo y dominio de variables
+- **Análisis Descriptivo Especializado**: Interpretación específica para variables sociales
+- **Análisis Bivariado Avanzado**: Correlaciones, contingencia y diferencias de medias
+- **Regresión Múltiple**: Con validación completa de supuestos
+- **Análisis de Clusters**: Identificación de grupos en datos sociales
+- **Índices Especializados**: Gini, calidad de vida, desarrollo humano
+- **Manejo de Valores Perdidos**: Análisis de patrones y sugerencias de imputación
 
 ### 🔍 **Filtros Dinámicos**
 - **Filtros por Rango**: Sliders para variables numéricas
@@ -261,4 +271,86 @@ Para soporte técnico o preguntas:
 
 ---
 
-**Desarrollado con ❤️ para la comunidad estadística** 
+**Desarrollado con ❤️ para la comunidad estadística**
+
+## 🎓 Análisis para Ciencias Sociales
+
+### **Variables Demográficas**
+- **Edad**: Análisis por rangos etarios y generaciones
+- **Género e Identidad**: Categorías ampliadas y dimensiones de expresión
+- **Estado Civil**: Tipos de unión y duración de relaciones
+- **Nacionalidad y Ciudadanía**: Estatus migratorio y tiempo de residencia
+- **Etnia y Raza**: Autoidentificación y pertenencia a pueblos originarios
+- **Lengua Materna**: Multilingüismo y uso en diferentes contextos
+
+### **Variables Socioeconómicas**
+- **Ingresos y Riqueza**: Análisis de desigualdad y distribución
+- **Empleo y Trabajo**: Formalidad, condiciones contractuales y sindicalización
+- **Pobreza y Vulnerabilidad**: Indicadores multidimensionales
+- **Vivienda y Hábitat**: Calidad constructiva y servicios básicos
+
+### **Variables Educativas y de Salud**
+- **Nivel de Escolaridad**: Años de educación y competencias
+- **Estado de Salud**: Enfermedades crónicas y cobertura sanitaria
+- **Salud Mental**: Escalas de depresión y ansiedad
+- **Hábitos de Vida**: Consumo de sustancias y actividad física
+
+### **Variables Culturales y Políticas**
+- **Religión y Espiritualidad**: Práctica y afiliación religiosa
+- **Participación Política**: Voto, identidad partidaria y confianza institucional
+- **Valores y Actitudes**: Postmaterialismo y cohesión social
+- **Tecnología y Comunicación**: Brecha digital y uso de redes sociales
+
+### **Análisis Estadísticos Especializados**
+
+#### **A. Clasificación Automática**
+- **Detección de Tipo**: Continua, categórica, ordinal, binaria
+- **Dominio de Variables**: Demográfico, socioeconómico, educativo, etc.
+- **Validación de Datos**: Detección de outliers y valores atípicos
+
+#### **B. Análisis Descriptivo Especializado**
+- **Interpretación Contextual**: Según el dominio de la variable
+- **Estadísticas Robustas**: Resistentes a outliers
+- **Análisis de Distribución**: Normalidad y transformaciones
+
+#### **C. Análisis Bivariado Avanzado**
+- **Correlaciones Múltiples**: Pearson, Spearman, Kendall
+- **Tablas de Contingencia**: Chi-cuadrado con medidas de asociación
+- **Análisis de Grupos**: ANOVA y pruebas no paramétricas
+
+#### **D. Regresión Múltiple**
+- **Validación de Supuestos**: Normalidad, homocedasticidad, independencia
+- **Multicolinealidad**: Detección y manejo
+- **Diagnóstico de Residuos**: Análisis completo de residuos
+
+#### **E. Análisis de Clusters**
+- **K-means**: Identificación de grupos naturales
+- **Caracterización**: Perfiles de cada cluster
+- **Validación**: Métricas de calidad del clustering
+
+#### **F. Índices Especializados**
+- **Coeficiente de Gini**: Medida de desigualdad
+- **Índice de Calidad de Vida**: Compuesto multidimensional
+- **Índice de Desarrollo Humano**: Simplificado
+
+#### **G. Manejo de Valores Perdidos**
+- **Análisis de Patrones**: Detección de patrones sistemáticos
+- **Sugerencias de Imputación**: Métodos apropiados por tipo de variable
+- **Validación de Imputación**: Verificación de calidad
+
+### **Recomendaciones para Investigación Social**
+
+#### **Diseño de Investigación**
+- **Muestreo Representativo**: Consideraciones para encuestas
+- **Ponderación de Datos**: Ajustes por estratificación
+- **Tamaño de Muestra**: Cálculos de potencia estadística
+
+#### **Análisis Ético**
+- **Anonimización**: Protección de datos personales
+- **Consentimiento Informado**: Cumplimiento de estándares éticos
+- **Transparencia**: Documentación completa de métodos
+
+#### **Comparabilidad**
+- **Estandarización**: Métodos para comparación internacional
+- **Indicadores Compuestos**: Construcción de índices
+- **Validación Cruzada**: Verificación de robustez 

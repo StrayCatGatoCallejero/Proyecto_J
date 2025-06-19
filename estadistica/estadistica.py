@@ -12,14 +12,32 @@ import io
 import base64
 from datetime import datetime
 import json
+import pyreadstat
+import os
 
 def cargar_archivo(path: str) -> pd.DataFrame:
-    if path.lower().endswith(".sav"):
-        return pd.read_spss(path)
-    elif path.lower().endswith(".dta"):
-        return pd.read_stata(path)
-    else:
-        raise ValueError("Formato no soportado: usa .sav o .dta")
+    """
+    Carga un archivo .sav o .dta de forma robusta, usando pyreadstat para mayor compatibilidad y manejo de errores.
+    """
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"El archivo no existe: {path}")
+    if os.path.getsize(path) == 0:
+        raise ValueError("El archivo está vacío")
+    try:
+        if path.lower().endswith(".sav"):
+            df, meta = pyreadstat.read_sav(path)
+        elif path.lower().endswith(".dta"):
+            try:
+                df, meta = pyreadstat.read_dta(path)
+            except UnicodeDecodeError:
+                df, meta = pyreadstat.read_dta(path, encoding='latin1')
+        else:
+            raise ValueError("Formato no soportado: usa .sav o .dta")
+        return df
+    except UnicodeDecodeError as e:
+        raise ValueError(f"Error de codificación: {e}. El archivo puede estar corrupto o usar una codificación diferente.")
+    except Exception as e:
+        raise ValueError(f"Error al leer archivo: {e}")
 
 def calcular_media(df: pd.DataFrame, columna: str) -> float:
     return float(df[columna].mean())

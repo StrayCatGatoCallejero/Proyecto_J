@@ -9,6 +9,11 @@ import seaborn as sns
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from sklearn.impute import SimpleImputer, KNNImputer
+import tempfile
+import base64
+import json
+from fpdf import FPDF
 
 # Configuración de estilo
 plt.style.use('default')
@@ -235,6 +240,22 @@ def crear_visualizacion(df, col, tipo_vis, tipo_col):
         fig.update_layout(title=f"Frecuencias de {col}")
         return fig
 
+def exportar_pdf(df, output_pdf="reporte_tabla.pdf", max_rows=20):
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.set_font("Arial", size=10)
+    # Encabezados
+    for col in df.columns:
+        pdf.cell(40, 10, str(col), 1)
+    pdf.ln()
+    # Primeras filas
+    for i, row in df.head(max_rows).iterrows():
+        for val in row:
+            pdf.cell(40, 10, str(val), 1)
+        pdf.ln()
+    pdf.output(output_pdf)
+    return output_pdf
+
 # =====================
 # Wizard de visualización de datos
 # =====================
@@ -260,6 +281,12 @@ if 'tipo_columna' not in st.session_state:
     st.session_state.tipo_columna = None
 if 'visualizacion' not in st.session_state:
     st.session_state.visualizacion = None
+if 'imputacion_log' not in st.session_state:
+    st.session_state.imputacion_log = []
+if 'df_original' not in st.session_state:
+    st.session_state.df_original = None
+if 'imputacion_hist' not in st.session_state:
+    st.session_state.imputacion_hist = {}
 
 # Sidebar: navegación y ayuda
 with st.sidebar:
@@ -331,27 +358,23 @@ def paso_1():
 # Paso 2: Resumen automático
 def paso_2():
     st.header("📊 Paso 2: Resumen automático de los datos")
-    
     df = st.session_state.df
-    
+    if st.session_state.df_original is None:
+        st.session_state.df_original = df.copy()
     col1, col2 = st.columns([1, 1])
-    
     with col1:
         st.subheader("📋 Información general")
         st.metric("Filas", f"{df.shape[0]:,}")
         st.metric("Columnas", df.shape[1])
         st.metric("Memoria utilizada", f"{df.memory_usage(deep=True).sum() / 1024**2:.1f} MB")
-        
         st.subheader("🔍 Primeras filas")
         st.dataframe(df.head(), use_container_width=True)
-    
     with col2:
         st.subheader("📈 Tipos de datos")
         tipos_df = pd.DataFrame(df.dtypes, columns=["Tipo"])
         tipos_df["No nulos"] = df.count()
         tipos_df["% Completitud"] = (df.count() / len(df) * 100).round(1)
         st.dataframe(tipos_df, use_container_width=True)
-        
         st.subheader("⚠️ Valores faltantes")
         missing_df = pd.DataFrame({
             "Columna": df.columns,
@@ -359,7 +382,135 @@ def paso_2():
             "% Faltantes": (df.isnull().sum() / len(df) * 100).round(1)
         })
         st.dataframe(missing_df[missing_df["Valores faltantes"] > 0], use_container_width=True)
-    
+        # Botón de gestión avanzada
+        st.markdown("---")
+        if st.button("Gestión avanzada de valores faltantes ℹ️", help="Accede a opciones detalladas de imputación: métodos, comparación, revertir y logs."):
+            st.session_state.show_imputacion_panel = True
+    # Panel lateral/modal de gestión avanzada
+    if st.session_state.get('show_imputacion_panel', False):
+        with st.sidebar:
+            st.markdown("## Gestión avanzada de valores faltantes")
+            st.info("Aquí puedes explorar y ajustar métodos de imputación, comparar su efecto en tu dataset y revertir cambios. Cada acción incluye explicaciones y ejemplos para que entiendas su impacto.")
+            # Selección de columna
+            col_sel = st.selectbox("Selecciona la columna a imputar", df.columns[df.isnull().any()])
+            metodos = {
+                "Media": (SimpleImputer(strategy="mean"), "Suaviza outliers, puede subestimar la varianza."),
+                "Mediana": (SimpleImputer(strategy="median"), "Robusta ante valores extremos, elimina información de la forma de la distribución."),
+                "Moda": (SimpleImputer(strategy="most_frequent"), "Rellena con el valor más frecuente, útil para categóricas."),
+                "KNN": (KNNImputer(n_neighbors=3), "Conserva relaciones multivariables, más lento y sensible a 'k'.")
+            }
+            metodo_sel = st.selectbox("Método de imputación", list(metodos.keys()), help="Elige el método para comparar y aplicar.")
+            # Mini-visualización antes/después
+            col_data = df[col_sel]
+            fig, ax = plt.subplots(1, 2, figsize=(8, 3))
+            ax[0].hist(col_data.dropna(), bins=20, color='skyblue', alpha=0.7)
+            ax[0].set_title("Antes de imputar")
+            # Imputar temporalmente para preview
+            imputer = metodos[metodo_sel][0]
+            col_imputed = col_data.copy()
+            if metodo_sel == "KNN":
+                # KNN requiere matriz
+                temp_df = df[[col_sel]].copy()
+                col_imputed = pd.Series(imputer.fit_transform(temp_df).ravel(), index=temp_df.index)
+            else:
+                col_imputed = pd.Series(imputer.fit_transform(col_data.values.reshape(-1, 1)).ravel(), index=col_data.index)
+            ax[1].hist(col_imputed, bins=20, color='lightgreen', alpha=0.7)
+            ax[1].set_title(f"Después: {metodo_sel}")
+            st.pyplot(fig)
+            # Métricas clave
+            st.write("### Métricas clave")
+            n_imputados = col_data.isnull().sum()
+            media_ant = col_data.mean()
+            media_post = col_imputed.mean()
+            std_ant = col_data.std()
+            std_post = col_imputed.std()
+            st.write(f"Valores imputados: {n_imputados}")
+            st.write(f"Media antes/después: {media_ant:.2f} → {media_post:.2f}")
+            st.write(f"Desviación estándar antes/después: {std_ant:.2f} → {std_post:.2f}")
+            st.caption(metodos[metodo_sel][1])
+            # Aplicar, comparar, revertir
+            colA, colB, colC = st.columns([1, 1, 1])
+            with colA:
+                if st.button(f"Aplicar método {metodo_sel}"):
+                    # Guardar estado previo
+                    if col_sel not in st.session_state.imputacion_hist:
+                        st.session_state.imputacion_hist[col_sel] = col_data.copy()
+                    # Aplicar imputación
+                    if metodo_sel == "KNN":
+                        df[col_sel] = pd.Series(metodos[metodo_sel][0].fit_transform(df[[col_sel]]).ravel(), index=df.index)
+                    else:
+                        df[col_sel] = pd.Series(metodos[metodo_sel][0].fit_transform(df[[col_sel]]).ravel(), index=df.index)
+                    # Log
+                    st.session_state.imputacion_log.append({
+                        "fecha": str(datetime.now()),
+                        "columna": col_sel,
+                        "metodo": metodo_sel,
+                        "media_antes": media_ant,
+                        "media_despues": media_post,
+                        "std_antes": std_ant,
+                        "std_despues": std_post,
+                        "n_imputados": n_imputados
+                    })
+                    st.success(f"Imputación aplicada con {metodo_sel} a '{col_sel}'")
+            with colB:
+                if st.button("Comparar métodos"):
+                    st.session_state.comparar_metodos = True
+            with colC:
+                if st.button("Revertir imputación"):
+                    if col_sel in st.session_state.imputacion_hist:
+                        df[col_sel] = st.session_state.imputacion_hist[col_sel]
+                        st.session_state.imputacion_log.append({
+                            "fecha": str(datetime.now()),
+                            "columna": col_sel,
+                            "metodo": "Revertir",
+                            "media_antes": media_post,
+                            "media_despues": media_ant,
+                            "std_antes": std_post,
+                            "std_despues": std_ant,
+                            "n_imputados": n_imputados
+                        })
+                        st.success(f"Imputación revertida en '{col_sel}'")
+            # Comparación side-by-side
+            if st.session_state.get('comparar_metodos', False):
+                st.write("## Comparación de métodos (side-by-side)")
+                metodos_comp = st.multiselect("Selecciona hasta dos métodos para comparar", list(metodos.keys()), default=[metodo_sel])
+                if len(metodos_comp) == 2:
+                    fig2, ax2 = plt.subplots(1, 2, figsize=(10, 3))
+                    for i, m in enumerate(metodos_comp):
+                        if m == "KNN":
+                            temp = pd.Series(metodos[m][0].fit_transform(df[[col_sel]]).ravel(), index=df.index)
+                        else:
+                            temp = pd.Series(metodos[m][0].fit_transform(df[[col_sel]]).ravel(), index=df.index)
+                        ax2[i].hist(temp, bins=20, color=['skyblue', 'lightgreen'][i], alpha=0.7)
+                        ax2[i].set_title(m)
+                    st.pyplot(fig2)
+                    st.write("### Métricas comparativas")
+                    for m in metodos_comp:
+                        if m == "KNN":
+                            temp = pd.Series(metodos[m][0].fit_transform(df[[col_sel]]).ravel(), index=df.index)
+                        else:
+                            temp = pd.Series(metodos[m][0].fit_transform(df[[col_sel]]).ravel(), index=df.index)
+                        st.write(f"**{m}**: Media={temp.mean():.2f}, Std={temp.std():.2f}")
+                st.button("Cerrar comparación", on_click=lambda: st.session_state.update({"comparar_metodos": False}))
+            # Log de operaciones
+            st.markdown("---")
+            st.write("### Historial de imputaciones")
+            if st.session_state.imputacion_log:
+                st.dataframe(pd.DataFrame(st.session_state.imputacion_log))
+                # Descarga log
+                log_json = json.dumps(st.session_state.imputacion_log, indent=2, default=str)
+                st.download_button("Descargar log (JSON)", log_json, file_name="imputacion_log.json")
+                log_csv = pd.DataFrame(st.session_state.imputacion_log).to_csv(index=False)
+                st.download_button("Descargar log (CSV)", log_csv, file_name="imputacion_log.csv")
+            else:
+                st.info("No hay operaciones de imputación registradas aún.")
+            # Ayuda y tour guiado
+            st.markdown("---")
+            st.markdown("¿Necesitas ayuda? [Haz clic aquí para ver el tour guiado](#)")
+            st.caption("💡 Tip: si trabajas con series de tiempo, considera la interpolación o regresión para conservar patrones cronológicos.")
+            if st.button("Cerrar gestión avanzada"):
+                st.session_state.show_imputacion_panel = False
+    # Fin panel lateral/modal
     col1, col2, col3 = st.columns([1, 1, 1])
     with col2:
         if st.button("➡️ Continuar", type="primary"):
@@ -571,7 +722,16 @@ def paso_7():
             file_name="resumen_tipos_variables.csv",
             mime="text/csv"
         )
-    
+        # Exportar a PDF
+        if st.button("📄 Exportar tabla a PDF"):
+            pdf_path = exportar_pdf(df)
+            with open(pdf_path, "rb") as f:
+                st.download_button(
+                    label="Descargar PDF generado",
+                    data=f,
+                    file_name="reporte_tabla.pdf",
+                    mime="application/pdf"
+                )
     with col2:
         st.subheader("📈 Próximas mejoras")
         st.markdown("""

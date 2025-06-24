@@ -353,4 +353,22 @@ Para soporte técnico o preguntas:
 #### **Comparabilidad**
 - **Estandarización**: Métodos para comparación internacional
 - **Indicadores Compuestos**: Construcción de índices
-- **Validación Cruzada**: Verificación de robustez 
+- **Validación Cruzada**: Verificación de robustez
+
+---
+
+## 🤝 Agradecimientos y Reconocimientos
+
+Este proyecto se ha enriquecido gracias a la inspiración, ideas y herramientas de la comunidad open source. Agradecemos especialmente a los siguientes proyectos y autores:
+
+- **[pandas](https://pandas.pydata.org/)** y **[pyreadstat](https://github.com/Roche/pyreadstat)**: Carga y manipulación de datos en múltiples formatos.
+- **[missingno](https://github.com/ResidentMario/missingno)**: Visualización de valores faltantes.
+- **[scikit-learn](https://scikit-learn.org/)**: Imputación y procesamiento avanzado de datos.
+- **[dataprep](https://github.com/sfu-db/dataprep)**: Generación de reportes EDA interactivos.
+- **[statsmodels](https://www.statsmodels.org/)**: Modelos estadísticos y análisis de encuestas.
+- **[FPDF](https://pyfpdf.github.io/)**: Exportación de resultados a PDF.
+- **[LisaKey/convert-csv-to-sav](https://github.com/LisaKey/convert-csv-to-sav)**, **[jiogenes/predicting_missing_value](https://github.com/jiogenes/predicting_missing_value)**, **[Ree2612/csv-to-pdf-report-generator](https://github.com/Ree2612/csv-to-pdf-report-generator)**: Inspiración y ejemplos para robustecer la gestión de datos y reportes.
+
+Agradecemos a la comunidad de desarrolladores y científic@s de datos por compartir conocimiento y herramientas que hacen posible sistemas más robustos, transparentes y útiles para todos.
+
+--- 

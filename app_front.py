@@ -52,6 +52,111 @@ from estadistica.ciencias_sociales import (
 )
 
 st.set_page_config(page_title="🔢 Estadísticas Ninja", layout="wide")
+
+# CSS personalizado para mantener consistencia visual
+st.markdown("""
+<style>
+    /* Importar fuentes */
+    @import url('https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700&family=Libre+Baskerville:wght@400;700&display=swap');
+    
+    /* FORZAR MODO CLARO - CSS adicional para garantizar modo claro */
+    html, body {
+        color-scheme: light !important;
+        background-color: #FBF7F2 !important;
+        color: #333333 !important;
+    }
+    
+    /* Variables CSS para la paleta de colores */
+    :root {
+        --color-fondo-general: #FBF7F2;      /* Fondo general muy claro */
+        --color-fondo-secundario: #F5E3D3;   /* Crema para tarjetas */
+        --color-azul-claro: #C7DCE5;         /* Azul muy claro para área de contenido */
+        --color-azul-profundo: #648DA5;      /* Azul profundo */
+        --color-texto-principal: #2C3E50;    /* Texto principal */
+        --color-texto-secundario: #7F8C8D;   /* Texto secundario */
+        --color-sombra: rgba(0, 0, 0, 0.08);
+        --border-radius: 12px;
+        --espaciado: 24px;
+        --espaciado-pequeno: 16px;
+    }
+    
+    /* Forzar modo claro en elementos de Streamlit */
+    .stApp {
+        background-color: var(--color-fondo-general) !important;
+        color: var(--color-texto-principal) !important;
+    }
+    
+    /* ÁREA DE CONTENIDO PRINCIPAL - Fondo azul claro */
+    .main > div {
+        background-color: var(--color-azul-claro) !important;
+        padding: 1rem;
+        border-radius: 10px;
+        margin: 0.5rem;
+        box-shadow: 0 2px 8px var(--color-sombra);
+    }
+    
+    /* PANEL LATERAL IZQUIERDO - Fondo oscuro */
+    .css-1d391kg {
+        background-color: #333333 !important;
+        border-right: 1px solid #555555;
+        padding: var(--espaciado);
+    }
+    
+    .css-1d391kg .sidebar-content {
+        background-color: #333333 !important;
+        color: #FFFFFF !important;
+    }
+    
+    /* Texto en el sidebar */
+    .css-1d391kg h1, .css-1d391kg h2, .css-1d391kg h3, 
+    .css-1d391kg h4, .css-1d391kg h5, .css-1d391kg h6 {
+        color: #FFFFFF !important;
+    }
+    
+    .css-1d391kg p, .css-1d391kg div, .css-1d391kg span {
+        color: #CCCCCC !important;
+    }
+    
+    /* Elementos de Streamlit en el sidebar */
+    .css-1d391kg .stMarkdown, .css-1d391kg .stText {
+        background-color: transparent !important;
+        color: #CCCCCC !important;
+    }
+    
+    /* Elementos de Streamlit en el área principal */
+    .stMarkdown, .stText, .stDataFrame, .stPlotlyChart {
+        background-color: transparent !important;
+    }
+    
+    /* Títulos principales */
+    h1 {
+        font-family: 'Raleway', sans-serif;
+        font-size: 2.5rem;
+        font-weight: 600;
+        color: var(--color-azul-profundo);
+        text-align: center;
+        margin-bottom: var(--espaciado);
+    }
+    
+    /* Botones */
+    .stButton > button {
+        background-color: var(--color-azul-profundo);
+        color: #FFFFFF;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .stButton > button:hover {
+        background-color: var(--color-azul-claro);
+        color: var(--color-texto-principal);
+        transform: translateY(-1px);
+    }
+</style>
+""", unsafe_allow_html=True)
+
 st.title("🔢 Procesamiento Estadístico + Frontend")
 
 # ============================================================================

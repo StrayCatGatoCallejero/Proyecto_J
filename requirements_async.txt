@@ -1,0 +1,24 @@
+# requirements_async.txt
+# Dependencias para procesamiento asíncrono con Celery y Redis
+
+# Celery para tareas asíncronas
+celery>=5.3.0
+
+# Redis para broker de mensajes
+redis>=4.5.0
+
+# PyArrow para archivos Parquet
+pyarrow>=12.0.0
+
+# Fastparquet como alternativa para Parquet
+fastparquet>=2023.0.0
+
+# Dependencias adicionales para procesamiento de datos
+numpy>=1.24.0
+pandas>=2.0.0
+
+# Streamlit (si no está en requirements.txt principal)
+streamlit>=1.28.0
+
+# Utilidades adicionales
+python-dotenv>=1.0.0 

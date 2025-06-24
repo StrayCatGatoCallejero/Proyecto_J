@@ -14,6 +14,7 @@ from datetime import datetime
 import json
 import pyreadstat
 import os
+from matplotlib.figure import Figure
 
 def cargar_archivo(path: str) -> pd.DataFrame:
     """
@@ -27,6 +28,9 @@ def cargar_archivo(path: str) -> pd.DataFrame:
         if path.lower().endswith(".sav"):
             df, meta = pyreadstat.read_sav(path)
         elif path.lower().endswith(".dta"):
+
+
+
             try:
                 df, meta = pyreadstat.read_dta(path)
             except UnicodeDecodeError:
@@ -71,29 +75,16 @@ def calcular_correlacion_spearman(df: pd.DataFrame, columnas: list) -> pd.DataFr
     df_seleccionado = df[columnas].dropna()
     return df_seleccionado.corr(method='spearman')
 
-def generar_heatmap_correlacion(df_corr: pd.DataFrame, titulo: str = "Matriz de Correlación"):
+def generar_heatmap_correlacion(df_corr: pd.DataFrame, titulo: str = "Matriz de Correlación") -> Figure:
     """
     Genera un heatmap de la matriz de correlación.
     """
-    plt.figure(figsize=(10, 8))
-    
-    # Crear máscara para mostrar solo la mitad inferior del triángulo
+    fig, ax = plt.subplots(figsize=(10, 8))
     mask = np.triu(np.ones_like(df_corr, dtype=bool))
-    
-    # Crear el heatmap
-    sns.heatmap(df_corr, 
-                mask=mask,
-                annot=True, 
-                cmap='coolwarm', 
-                center=0,
-                square=True,
-                fmt='.3f',
-                cbar_kws={"shrink": .8})
-    
-    plt.title(titulo, fontsize=16, fontweight='bold')
-    plt.tight_layout()
-    
-    return plt.gcf()
+    sns.heatmap(df_corr, mask=mask, annot=True, cmap='coolwarm', center=0, square=True, fmt='.3f', cbar_kws={"shrink": .8}, ax=ax)
+    ax.set_title(titulo, fontsize=16, fontweight='bold')
+    fig.tight_layout()
+    return fig
 
 def obtener_columnas_numericas(df: pd.DataFrame) -> list:
     """
@@ -144,13 +135,11 @@ def calcular_chi_cuadrado(df: pd.DataFrame, columna1: str, columna2: str) -> dic
         'sample_size': n
     }
 
-def generar_grafico_tabla_contingencia(df: pd.DataFrame, columna1: str, columna2: str):
+def generar_grafico_tabla_contingencia(df: pd.DataFrame, columna1: str, columna2: str) -> Figure:
     """
     Genera un gráfico de barras apiladas para visualizar la tabla de contingencia.
     """
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
-    
-    # Gráfico 1: Barras apiladas
     tabla = pd.crosstab(df[columna1], df[columna2])
     tabla.plot(kind='bar', stacked=True, ax=ax1)
     ax1.set_title(f'Distribución de {columna2} por {columna1}')
@@ -158,12 +147,9 @@ def generar_grafico_tabla_contingencia(df: pd.DataFrame, columna1: str, columna2
     ax1.set_ylabel('Frecuencia')
     ax1.legend(title=columna2, bbox_to_anchor=(1.05, 1), loc='upper left')
     ax1.tick_params(axis='x', rotation=45)
-    
-    # Gráfico 2: Heatmap de la tabla de contingencia
     sns.heatmap(tabla, annot=True, fmt='d', cmap='Blues', ax=ax2)
     ax2.set_title(f'Tabla de Contingencia: {columna1} vs {columna2}')
-    
-    plt.tight_layout()
+    fig.tight_layout()
     return fig
 
 def calcular_porcentajes_tabla_contingencia(df: pd.DataFrame, columna1: str, columna2: str) -> dict:
@@ -236,47 +222,24 @@ def obtener_categorias_variable(df: pd.DataFrame, columna: str) -> list:
 def aplicar_filtros(df: pd.DataFrame, filtros: dict) -> pd.DataFrame:
     """
     Aplica múltiples filtros a un DataFrame.
-    
-    Args:
-        df: DataFrame original
-        filtros: Diccionario con filtros a aplicar
-                {
-                    'columna_numerica': {'min': valor, 'max': valor},
-                    'columna_categorica': ['categoria1', 'categoria2']
-                }
-    
-    Returns:
-        DataFrame filtrado
     """
     df_filtrado = df.copy()
-    
     for columna, filtro in filtros.items():
-        if columna in df_filtrado.columns:
+        if hasattr(df_filtrado, 'columns') and columna in df_filtrado.columns:
             if isinstance(filtro, dict) and 'min' in filtro and 'max' in filtro:
-                # Filtro numérico (rango)
-                df_filtrado = df_filtrado[
-                    (df_filtrado[columna] >= filtro['min']) & 
-                    (df_filtrado[columna] <= filtro['max'])
-                ]
+                df_filtrado = df_filtrado[(df_filtrado[columna] >= filtro['min']) & (df_filtrado[columna] <= filtro['max'])]
             elif isinstance(filtro, list):
-                # Filtro categórico (categorías seleccionadas)
-                df_filtrado = df_filtrado[df_filtrado[columna].isin(filtro)]
-    
+                if hasattr(df_filtrado[columna], 'isin'):
+                    df_filtrado = df_filtrado[df_filtrado[columna].isin(filtro)]
     return df_filtrado
 
 def crear_filtros_dinamicos(df: pd.DataFrame, columnas_numericas: list = None, columnas_categoricas: list = None) -> dict:
     """
     Crea un diccionario con información para generar filtros dinámicos.
-    
-    Returns:
-        Diccionario con información de filtros para cada columna
     """
     filtros_info = {}
-    
-    # Filtros para variables numéricas
-    if columnas_numericas is None:
+    if columnas_numericas is None or not isinstance(columnas_numericas, list):
         columnas_numericas = obtener_columnas_numericas(df)
-    
     for col in columnas_numericas:
         min_val, max_val = obtener_rango_variable(df, col)
         if min_val is not None and max_val is not None:
@@ -287,11 +250,8 @@ def crear_filtros_dinamicos(df: pd.DataFrame, columnas_numericas: list = None, c
                 'actual_min': min_val,
                 'actual_max': max_val
             }
-    
-    # Filtros para variables categóricas
-    if columnas_categoricas is None:
+    if columnas_categoricas is None or not isinstance(columnas_categoricas, list):
         columnas_categoricas = obtener_columnas_categoricas(df)
-    
     for col in columnas_categoricas:
         categorias = obtener_categorias_variable(df, col)
         if categorias:
@@ -300,7 +260,6 @@ def crear_filtros_dinamicos(df: pd.DataFrame, columnas_numericas: list = None, c
                 'categorias': categorias,
                 'categorias_seleccionadas': categorias
             }
-    
     return filtros_info
 
 def obtener_estadisticas_filtradas(df: pd.DataFrame, filtros: dict) -> dict:
@@ -440,20 +399,131 @@ def generar_html_reporte(df: pd.DataFrame, filtros: dict, estadisticas_descripti
         <meta charset="UTF-8">
         <title>Reporte de Análisis Estadístico</title>
         <style>
-            body {{ font-family: Arial, sans-serif; margin: 40px; }}
-            h1 {{ color: #2c3e50; border-bottom: 3px solid #3498db; }}
-            h2 {{ color: #34495e; margin-top: 30px; }}
-            h3 {{ color: #7f8c8d; }}
-            .header {{ background-color: #ecf0f1; padding: 20px; border-radius: 10px; }}
-            .section {{ margin: 20px 0; padding: 15px; border-left: 4px solid #3498db; }}
-            .metric {{ display: inline-block; margin: 10px; padding: 10px; background-color: #f8f9fa; border-radius: 5px; }}
-            .metric strong {{ color: #2c3e50; }}
-            table {{ border-collapse: collapse; width: 100%; margin: 10px 0; }}
-            th, td {{ border: 1px solid #ddd; padding: 8px; text-align: left; }}
-            th {{ background-color: #3498db; color: white; }}
-            tr:nth-child(even) {{ background-color: #f2f2f2; }}
-            .filtros {{ background-color: #fff3cd; padding: 10px; border-radius: 5px; margin: 10px 0; }}
-            .interpretacion {{ background-color: #d1ecf1; padding: 10px; border-radius: 5px; margin: 10px 0; }}
+            /* Paleta de colores del Proyecto J - Actualizada */
+            :root {{
+                --color-fondo-general: #FBF7F2;      /* Fondo general muy claro */
+                --color-fondo-secundario: #F5E3D3;   /* Crema para tarjetas */
+                --color-crema: #F5E3D3;              /* Crema más profundo */
+                --color-durazno: #FFD9AE;            /* Durazno original */
+                --color-arena: #D4A476;              /* Arena */
+                --color-azul-claro: #9EBFCC;         /* Azul claro */
+                --color-azul-profundo: #648DA5;      /* Azul profundo */
+                --color-texto-principal: #2C3E50;    /* Texto principal */
+                --color-texto-secundario: #7F8C8D;   /* Texto secundario */
+                --color-blanco-suave: #FBF7F2;       /* Blanco suave */
+                --color-sombra: rgba(0, 0, 0, 0.08);
+                --border-radius: 12px;
+                --espaciado: 24px;
+                --espaciado-pequeno: 16px;
+            }}
+            
+            /* Forzar modo claro */
+            html, body {{
+                color-scheme: light !important;
+                background-color: var(--color-fondo-general) !important;
+                color: var(--color-texto-principal) !important;
+            }}
+            
+            body {{ 
+                font-family: 'Helvetica', sans-serif; 
+                margin: 40px; 
+                background-color: var(--color-fondo-general) !important;
+                color: var(--color-texto-principal);
+                line-height: 1.6;
+            }}
+            
+            h1 {{ 
+                color: var(--color-azul-profundo); 
+                border-bottom: 3px solid var(--color-azul-claro);
+                font-family: 'Raleway', sans-serif;
+                font-weight: 600;
+            }}
+            
+            h2 {{ 
+                color: var(--color-azul-profundo); 
+                margin-top: 30px;
+                font-family: 'Raleway', sans-serif;
+                font-weight: 500;
+            }}
+            
+            h3 {{ 
+                color: var(--color-texto-secundario);
+                font-family: 'Raleway', sans-serif;
+            }}
+            
+            .header {{ 
+                background-color: var(--color-fondo-secundario) !important; 
+                padding: 20px; 
+                border-radius: var(--border-radius);
+                border: 1px solid var(--color-durazno);
+                box-shadow: 0 2px 8px var(--color-sombra);
+            }}
+            
+            .section {{ 
+                margin: 20px 0; 
+                padding: 15px; 
+                border-left: 4px solid var(--color-azul-claro);
+                background-color: var(--color-fondo-secundario) !important;
+                border-radius: var(--border-radius);
+                box-shadow: 0 2px 4px var(--color-sombra);
+            }}
+            
+            .metric {{ 
+                display: inline-block; 
+                margin: 10px; 
+                padding: 10px; 
+                background-color: var(--color-azul-claro); 
+                border-radius: 8px;
+                border: 1px solid var(--color-azul-profundo);
+            }}
+            
+            .metric strong {{ 
+                color: var(--color-texto-principal); 
+            }}
+            
+            table {{ 
+                border-collapse: collapse; 
+                width: 100%; 
+                margin: 10px 0; 
+                border-radius: var(--border-radius);
+                overflow: hidden;
+                box-shadow: 0 2px 4px var(--color-sombra);
+            }}
+            
+            th, td {{ 
+                border: 1px solid var(--color-durazno); 
+                padding: 8px; 
+                text-align: left; 
+            }}
+            
+            th {{ 
+                background-color: var(--color-azul-profundo); 
+                color: var(--color-blanco-suave) !important; 
+            }}
+            
+            tr:nth-child(even) {{ 
+                background-color: var(--color-fondo-general); 
+            }}
+            
+            tr:nth-child(odd) {{ 
+                background-color: var(--color-fondo-secundario) !important; 
+            }}
+            
+            .filtros {{ 
+                background-color: var(--color-durazno); 
+                padding: 10px; 
+                border-radius: 8px; 
+                margin: 10px 0;
+                border: 1px solid var(--color-arena);
+            }}
+            
+            .interpretacion {{ 
+                background-color: var(--color-azul-claro); 
+                padding: 10px; 
+                border-radius: 8px; 
+                margin: 10px 0;
+                border: 1px solid var(--color-azul-profundo);
+            }}
         </style>
     </head>
     <body>
@@ -888,16 +958,13 @@ def generar_panel_visualizaciones(df: pd.DataFrame, columna_principal: str, colu
     plt.tight_layout()
     return fig
 
-def generar_scatter_matrix(df: pd.DataFrame, variables: list):
+def generar_scatter_matrix(df: pd.DataFrame, variables: list) -> plt.Figure:
     """
     Genera una matriz de scatter plots para múltiples variables.
     """
-    # Limitar a 6 variables para evitar gráficos muy grandes
     if len(variables) > 6:
         variables = variables[:6]
-    
     fig = sns.pairplot(df[variables], diag_kind='kde')
     fig.fig.suptitle('Matriz de Scatter Plots', y=1.02)
     fig.fig.set_size_inches(12, 10)
-    
     return fig.fig

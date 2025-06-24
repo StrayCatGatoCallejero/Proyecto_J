@@ -1,0 +1,55 @@
+provincia_code,provincia_nombre,region_code
+011,Arica,15
+014,Parinacota,15
+021,Iquique,01
+022,Tamarugal,01
+023,Antofagasta,02
+024,El Loa,02
+025,Tocopilla,02
+031,Chañaral,03
+032,Copiapó,03
+033,Huasco,03
+041,Choapa,04
+042,Elqui,04
+043,Limarí,04
+051,Isla de Pascua,05
+052,Los Andes,05
+053,Marga Marga,05
+054,Petorca,05
+055,Quillota,05
+056,San Antonio,05
+057,San Felipe de Aconcagua,05
+058,Valparaíso,05
+061,Cachapoal,06
+062,Cardenal Caro,06
+063,Colchagua,06
+071,Cauquenes,07
+072,Curicó,07
+073,Linares,07
+074,Talca,07
+081,Arauco,08
+082,Biobío,08
+083,Concepción,08
+084,Ñuble,16
+091,Cautín,09
+092,Malleco,09
+101,Chiloé,10
+102,Llanquihue,10
+103,Osorno,10
+104,Palena,10
+111,Aysén,11
+112,Capitán Prat,11
+113,Coyhaique,11
+114,General Carrera,11
+121,Antártica Chilena,12
+122,Magallanes,12
+123,Tierra del Fuego,12
+124,Última Esperanza,12
+131,Chacabuco,13
+132,Cordillera,13
+133,Maipo,13
+134,Melipilla,13
+135,Santiago,13
+136,Talagante,13
+141,Ranco,14
+142,Valdivia,14 

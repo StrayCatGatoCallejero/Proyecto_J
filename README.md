@@ -11,6 +11,16 @@ Una aplicación web completa para análisis estadístico de archivos `.sav` y `.
 - **Visualizaciones Avanzadas**: Boxplots, scatter plots, diagramas de densidad y más
 - **Ciencias Sociales**: Análisis especializado para investigación social y demográfica
 
+### **Aplicación de Análisis Estadístico Avanzado** (`app_estadistica_avanzada.py`)
+- **Interfaz Unificada**: Todas las funcionalidades en una sola aplicación
+- **Filtros Dinámicos**: Sliders para variables numéricas y multiselects para categóricas
+- **Correlaciones Interactivas**: Matrices de correlación con heatmaps de Plotly
+- **Tablas de Contingencia**: Análisis χ² completo con visualizaciones
+- **Visualizaciones Avanzadas**: Boxplots, scatter plots, density plots, violin plots, scatter matrix
+- **Exportación Completa**: CSV, HTML con reportes profesionales
+- **Detección Automática**: Tipos de variables detectados automáticamente
+- **Estado Persistente**: Filtros y resultados mantenidos entre sesiones
+
 ###  **Análisis para Ciencias Sociales**
 - **Clasificación Automática**: Detección automática del tipo y dominio de variables
 - **Análisis Descriptivo Especializado**: Interpretación específica para variables sociales
@@ -60,6 +70,23 @@ pip install -r requirements.txt
 ```bash
 streamlit run app_front.py
 ```
+
+### **Aplicación de Análisis Estadístico Avanzado**
+
+Para usar la aplicación unificada con todas las funcionalidades:
+
+```bash
+streamlit run app_estadistica_avanzada.py
+```
+
+**Características de la aplicación avanzada:**
+- ✅ **Carga de archivos CSV** con detección automática de tipos
+- ✅ **Filtros dinámicos** aplicados globalmente a todos los análisis
+- ✅ **Correlaciones** con matrices interactivas y heatmaps
+- ✅ **Tablas de contingencia** con pruebas χ² y visualizaciones
+- ✅ **Visualizaciones avanzadas** (boxplots, scatter, density, violin, etc.)
+- ✅ **Exportación completa** en CSV y HTML con reportes profesionales
+- ✅ **Interfaz responsiva** con navegación intuitiva
 
 ##  Dependencias
 
@@ -128,6 +155,60 @@ openpyxl>=3.1.0
 - **Excel Completo**: Todas las hojas en un archivo
 - **HTML Completo**: Reporte profesional con interpretaciones
 - **Datos Filtrados**: Conjuntos personalizados
+
+##  Uso de la Aplicación Avanzada (`app_estadistica_avanzada.py`)
+
+### **1. Carga de Datos**
+- Sube archivos **CSV** directamente
+- **Detección automática** de tipos de variables (numérico, categórico, texto)
+- **Vista previa** inmediata con información del dataset
+- **Métricas en tiempo real**: filas, columnas, memoria utilizada
+
+### **2. Filtros Dinámicos**
+- **Variables Numéricas**: Sliders con rangos personalizables
+- **Variables Categóricas**: Multiselect con todas las categorías disponibles
+- **Aplicación Global**: Los filtros se aplican a todos los análisis automáticamente
+- **Resumen en Tiempo Real**: Muestra cuántos registros quedan después de filtrar
+- **Vista Previa**: Datos filtrados disponibles para revisión
+
+### **3. Análisis de Correlación**
+- **Selección Múltiple**: Elige las variables numéricas que quieres analizar
+- **Métodos Disponibles**: Pearson (lineal) y Spearman (monótona)
+- **Matriz Interactiva**: Tabla con valores de correlación redondeados
+- **Heatmap de Plotly**: Visualización interactiva con zoom y hover
+- **Interpretación Guiada**: Explicación de los valores de correlación
+
+### **4. Tablas de Contingencia**
+- **Selección de Variables**: Dos variables categóricas para análisis
+- **Tabla Completa**: Frecuencias absolutas con totales
+- **Porcentajes por Fila**: Distribución porcentual
+- **Prueba Chi-Cuadrado**: Estadístico, p-valor y grados de libertad
+- **Interpretación Automática**: Significancia estadística explicada
+- **Visualizaciones**: Gráficos de barras o heatmaps de la tabla
+
+### **5. Visualizaciones Avanzadas**
+- **Boxplots**: Distribución y outliers (simple o por grupos)
+- **Scatter Plots**: Relaciones entre variables con línea de tendencia opcional
+- **Density Plots**: Distribuciones de densidad con histograma marginal
+- **Violin Plots**: Distribuciones completas (simple o por grupos)
+- **Scatter Matrix**: Matriz de dispersión para múltiples variables
+- **Heatmaps Avanzados**: Matrices de correlación interactivas
+
+### **6. Exportación Completa**
+- **Datos Filtrados**: CSV con los datos después de aplicar filtros
+- **Estadísticas Descriptivas**: CSV con resumen estadístico
+- **Matriz de Correlación**: CSV con valores de correlación
+- **Tabla de Contingencia**: CSV con frecuencias y porcentajes
+- **Reporte CSV Completo**: Todos los análisis en un archivo
+- **Reporte HTML Profesional**: Formato web con interpretaciones
+
+### **Características Técnicas Avanzadas**
+- **Session State**: Filtros y resultados persistentes entre recargas
+- **Detección Automática**: Tipos de variables sin configuración manual
+- **Validaciones**: Verificación de datos y rangos válidos
+- **Optimización**: Cálculos eficientes y reutilización de resultados
+- **Interfaz Reactiva**: Actualizaciones automáticas según selecciones
+- **Manejo de Errores**: Mensajes informativos para problemas comunes
 
 ##  Tipos de Visualizaciones Disponibles
 

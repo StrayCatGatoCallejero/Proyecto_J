@@ -1,0 +1,31 @@
+id,edad,genero,nivel_educacion,ingresos,gastos,ahorros,satisfaccion_trabajo,satisfaccion_vida,confianza_gobierno,orientacion_politica,region,opinion_abierta
+1,28,Masculino,Universitario,45000,32000,13000,4,5,2,Centro-izquierda,Metropolitana,Me siento muy satisfecho con mi trabajo actual y la calidad de vida que tengo.
+2,35,Femenino,Postgrado,65000,45000,20000,5,4,3,Centro,Valparaíso,El sistema de salud necesita mejoras pero en general estoy contenta.
+3,42,No binario,Técnico,38000,28000,10000,3,3,1,Izquierda,Biobío,No estoy satisfecho con las políticas del gobierno actual.
+4,29,Femenino,Secundaria,28000,22000,6000,2,2,1,Izquierda,Metropolitana,La situación económica está muy difícil para la clase media.
+5,51,Masculino,Universitario,75000,50000,25000,4,4,4,Centro-derecha,O'Higgins,El país va por buen camino, confío en las instituciones.
+6,33,Femenino,Universitario,52000,38000,14000,4,5,2,Centro-izquierda,Metropolitana,Me gustaría ver más inversión en educación pública.
+7,45,Masculino,Técnico,42000,30000,12000,3,3,2,Centro,Maule,La seguridad ciudadana es un tema preocupante.
+8,26,Femenino,Universitario,48000,35000,13000,5,4,3,Centro-derecha,Valparaíso,Estoy satisfecha con mi desarrollo profesional.
+9,38,No binario,Postgrado,68000,48000,20000,4,5,4,Derecha,Metropolitana,El sistema económico funciona bien para quienes pueden acceder.
+10,31,Masculino,Secundaria,32000,25000,7000,2,2,1,Izquierda,Biobío,Necesitamos cambios profundos en el modelo económico.
+11,47,Femenino,Universitario,58000,42000,16000,4,4,3,Centro-izquierda,O'Higgins,La educación es fundamental para el desarrollo del país.
+12,24,Masculino,Técnico,35000,28000,7000,3,3,2,Centro,Metropolitana,El transporte público necesita mejoras significativas.
+13,39,Femenino,Postgrado,72000,52000,20000,5,5,4,Centro-derecha,Valparaíso,Me siento muy afortunada con las oportunidades que he tenido.
+14,36,No binario,Universitario,55000,40000,15000,4,4,2,Centro-izquierda,Maule,Es importante que se mejore la distribución de la riqueza.
+15,43,Masculino,Técnico,45000,32000,13000,3,3,1,Izquierda,Biobío,El gobierno no está atendiendo las necesidades de la población.
+16,27,Femenino,Secundaria,30000,24000,6000,2,2,1,Izquierda,Metropolitana,La vivienda es muy cara para los jóvenes.
+17,49,Masculino,Universitario,65000,45000,20000,4,4,3,Centro,O'Higgins,El sistema de pensiones necesita reformas urgentes.
+18,34,Femenino,Postgrado,70000,50000,20000,5,5,4,Derecha,Valparaíso,Chile tiene un gran potencial de desarrollo.
+19,41,No binario,Técnico,40000,30000,10000,3,3,2,Centro-izquierda,Maule,La desigualdad social es el principal problema del país.
+20,25,Masculino,Universitario,42000,32000,10000,4,4,3,Centro,Metropolitana,La tecnología está transformando positivamente la sociedad.
+21,37,Femenino,Universitario,58000,42000,16000,4,5,2,Centro-izquierda,Biobío,El medio ambiente debe ser una prioridad nacional.
+22,44,Masculino,Postgrado,75000,55000,20000,5,4,4,Centro-derecha,O'Higgins,El emprendimiento es clave para el desarrollo económico.
+23,30,No binario,Técnico,38000,29000,9000,3,3,1,Izquierda,Valparaíso,Los derechos laborales deben ser fortalecidos.
+24,46,Femenino,Universitario,62000,45000,17000,4,4,3,Centro,Maule,La salud mental es un tema que requiere más atención.
+25,32,Masculino,Secundaria,35000,28000,7000,2,2,1,Izquierda,Metropolitana,La corrupción afecta la confianza en las instituciones.
+26,40,Femenino,Postgrado,68000,48000,20000,5,5,4,Derecha,Biobío,Chile tiene instituciones sólidas y un futuro prometedor.
+27,35,No binario,Universitario,52000,38000,14000,4,4,2,Centro-izquierda,O'Higgins,La descentralización es importante para el desarrollo regional.
+28,48,Masculino,Técnico,48000,35000,13000,3,3,2,Centro,Valparaíso,El sistema educativo necesita más recursos y mejor calidad.
+29,29,Femenino,Universitario,45000,33000,12000,4,4,3,Centro-derecha,Maule,La innovación tecnológica está mejorando la calidad de vida.
+30,33,Masculino,Postgrado,70000,50000,20000,5,5,4,Derecha,Metropolitana,El país está en el camino correcto hacia el desarrollo. 

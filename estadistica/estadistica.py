@@ -18,7 +18,7 @@ from matplotlib.figure import Figure
 
 def cargar_archivo(path: str) -> pd.DataFrame:
     """
-    Carga un archivo .sav o .dta de forma robusta, usando pyreadstat para mayor compatibilidad y manejo de errores.
+    Carga un archivo .sav, .dta, .csv o .xlsx de forma robusta, usando pyreadstat para mayor compatibilidad y manejo de errores.
     """
     if not os.path.exists(path):
         raise FileNotFoundError(f"El archivo no existe: {path}")
@@ -28,18 +28,17 @@ def cargar_archivo(path: str) -> pd.DataFrame:
         if path.lower().endswith(".sav"):
             df, meta = pyreadstat.read_sav(path)
         elif path.lower().endswith(".dta"):
-
-
-
             try:
                 df, meta = pyreadstat.read_dta(path)
             except UnicodeDecodeError:
                 df, meta = pyreadstat.read_dta(path, encoding='latin1')
+        elif path.lower().endswith(".csv"):
+            df = pd.read_csv(path)
+        elif path.lower().endswith(".xlsx") or path.lower().endswith(".xls"):
+            df = pd.read_excel(path)
         else:
-            raise ValueError("Formato no soportado: usa .sav o .dta")
+            raise ValueError("Formato no soportado: usa .sav, .dta, .csv o .xlsx")
         return df
-    except UnicodeDecodeError as e:
-        raise ValueError(f"Error de codificación: {e}. El archivo puede estar corrupto o usar una codificación diferente.")
     except Exception as e:
         raise ValueError(f"Error al leer archivo: {e}")
 

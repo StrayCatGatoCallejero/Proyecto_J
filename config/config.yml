@@ -1,0 +1,235 @@
+# Configuración del Sistema de Análisis de Datos
+# =============================================
+
+# Esquema de datos por defecto
+schema:
+  # Tipos de datos soportados
+  data_types:
+    numeric:
+      - int64
+      - float64
+      - int32
+      - float32
+    categorical:
+      - object
+      - category
+      - string
+    temporal:
+      - datetime64[ns]
+      - datetime64[us]
+      - datetime64[ms]
+    boolean:
+      - bool
+      - boolean
+    
+  # Rangos de validación por tipo
+  validation_ranges:
+    age:
+      min: 0
+      max: 120
+      unit: "años"
+    income:
+      min: 0
+      max: 1000000000
+      unit: "CLP"
+    percentage:
+      min: 0
+      max: 100
+      unit: "%"
+    
+  # Patrones de validación
+  patterns:
+    email: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    phone: '^[+]?[0-9]{8,15}$'
+    dni: '^[0-9]{7,8}[A-Z]$'
+
+# Métodos por defecto
+methods:
+  # Imputación de datos faltantes
+  imputation:
+    numeric: "median"
+    categorical: "mode"
+    temporal: "forward_fill"
+    boolean: "mode"
+    
+  # Correlación
+  correlation:
+    default_method: "pearson"
+    alternatives: ["spearman", "kendall"]
+    min_correlation: 0.1
+    significance_level: 0.05
+    
+  # Chi-cuadrado
+  chi_square:
+    min_expected_frequency: 5
+    significance_level: 0.05
+    
+  # Normalización
+  normalization:
+    similarity_threshold: 0.8
+    confidence_threshold: 0.7
+
+# Parámetros de UI
+ui:
+  # Colores temáticos
+  colors:
+    primary: "#1f77b4"
+    secondary: "#ff7f0e"
+    success: "#2ca02c"
+    warning: "#d62728"
+    info: "#9467bd"
+    
+  # Iconos
+  icons:
+    data_load: "📁"
+    validation: "✅"
+    analysis: "📊"
+    visualization: "📈"
+    export: "💾"
+    error: "❌"
+    warning: "⚠️"
+    info: "ℹ️"
+    
+  # Umbrales de la interfaz
+  thresholds:
+    max_rows_display: 1000
+    max_columns_display: 20
+    chunk_size: 10000
+    timeout_seconds: 30
+
+# Configuración de logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "logs/pipeline.log"
+  max_file_size: "10MB"
+  backup_count: 5
+
+# Configuración de exportación
+export:
+  formats:
+    - "csv"
+    - "excel"
+    - "json"
+    - "html"
+  compression: true
+  include_metadata: true
+  include_logs: true
+
+# Configuración de validación
+validation:
+  # Validación de esquema
+  schema:
+    strict: false
+    allow_extra_columns: true
+    allow_missing_columns: false
+    
+  # Validación de integridad
+  integrity:
+    check_duplicates: true
+    check_outliers: true
+    outlier_threshold: 3.0  # Desviaciones estándar
+    
+  # Validación de consistencia
+  consistency:
+    age_marital_check: true
+    age_education_check: true
+    income_education_check: true
+
+# Configuración de análisis semántico
+semantic:
+  # Diccionario de términos clave
+  keywords:
+    demographic:
+      - "edad"
+      - "genero"
+      - "sexo"
+      - "nacionalidad"
+      - "estado_civil"
+      - "educacion"
+      - "ocupacion"
+      
+    socioeconomic:
+      - "ingresos"
+      - "salario"
+      - "renta"
+      - "pobreza"
+      - "vivienda"
+      - "servicios"
+      
+    opinion:
+      - "satisfaccion"
+      - "confianza"
+      - "percepcion"
+      - "actitud"
+      - "opinion"
+      
+    likert:
+      - "acuerdo"
+      - "frecuencia"
+      - "importancia"
+      - "satisfaccion_escala"
+      
+  # Umbrales de clasificación
+  classification:
+    similarity_threshold: 0.7
+    confidence_threshold: 0.6
+
+# Configuración de visualización
+visualization:
+  # Tipos de gráficos por categoría
+  chart_types:
+    demographic:
+      - "bar_chart"
+      - "pie_chart"
+      - "horizontal_bar"
+      
+    numeric:
+      - "histogram"
+      - "box_plot"
+      - "scatter_plot"
+      
+    temporal:
+      - "line_chart"
+      - "area_chart"
+      - "heatmap"
+      
+    likert:
+      - "stacked_bar"
+      - "horizontal_bar"
+      - "diverging_bar"
+      
+    text:
+      - "word_cloud"
+      - "bar_chart"
+      - "treemap"
+      
+  # Configuración de gráficos
+  plotly:
+    template: "plotly_white"
+    height: 500
+    width: 800
+    
+  # Configuración de nube de palabras
+  wordcloud:
+    max_words: 100
+    background_color: "white"
+    colormap: "viridis"
+
+# Configuración de rendimiento
+performance:
+  # Procesamiento en chunks
+  chunk_processing:
+    enabled: true
+    chunk_size: 10000
+    
+  # Caché
+  cache:
+    enabled: true
+    max_size: "100MB"
+    ttl: 3600  # segundos
+    
+  # Paralelización
+  parallel:
+    enabled: true
+    max_workers: 4 

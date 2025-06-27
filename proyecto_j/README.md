@@ -1,3 +1,146 @@
+# Proyecto J
+
+[![CI](https://github.com/tu_usuario/proyecto_j/actions/workflows/ci.yml/badge.svg)](https://github.com/tu_usuario/proyecto_j/actions)
+
+## Estructura del repositorio
+
+```
+project_j/
+├── data/
+│   └── chile/
+│       ├── regiones.csv
+│       ├── provincias.csv
+│       ├── comunas.csv
+│       └── indicadores_regiones.csv
+├── src/
+│   ├── project_j_pipeline.py      # Pipeline principal
+│   ├── column_inspector.py        # Módulo de inspección de columnas
+│   ├── analisis_survey.py         # Funciones de survey design
+│   ├── analisis_demografico.py    # Funciones de análisis demográfico
+│   ├── pipeline_encuestas.py      # Pipeline de encuestas
+│   ├── estadistica.py             # Utilidades estadísticas
+│   ├── validacion_chile.py        # Validaciones específicas para Chile
+│   └── ciencias_sociales.py       # Funciones de ciencias sociales
+├── notebooks/
+│   ├── eda.ipynb                  # Exploración de datos
+│   └── demografia.ipynb           # Análisis demográfico
+├── tests/
+│   ├── test_pipeline.py           # Tests del pipeline principal
+│   └── test_column_inspector.py   # Tests del inspector de columnas
+├── requirements.txt
+├── environment.yml
+└── README.md
+```
+
+## Descripción de carpetas y archivos
+
+- **data/chile/**: Datos geográficos y de indicadores de Chile.
+- **src/**: Código fuente principal del proyecto, pipelines y módulos de análisis.
+- **notebooks/**: Jupyter Notebooks para EDA y análisis demográfico.
+- **tests/**: Pruebas automáticas con pytest.
+- **requirements.txt**: Dependencias para pip.
+- **environment.yml**: Dependencias para conda/mamba.
+- **README.md**: Este archivo.
+
+## Cómo arrancar el proyecto
+
+1. Instala las dependencias:
+   - Con pip:
+     ```bash
+     pip install -r requirements.txt
+     ```
+   - O con conda/mamba:
+     ```bash
+     conda env create -f environment.yml
+     conda activate proyecto_j
+     ```
+2. Ejecuta los tests:
+   ```bash
+   pytest tests/
+   ```
+3. Abre y ejecuta los notebooks en Jupyter:
+   ```bash
+   jupyter notebook notebooks/
+   ```
+4. Usa los scripts de `src/` para análisis y pipelines.
+
+## Uso desde la línea de comandos (CLI)
+
+Puedes ejecutar el pipeline completo desde terminal usando:
+
+```bash
+python -m proyecto_j.src.cli run --config proyecto_j/config.yml
+```
+
+Donde `config.yml` es un archivo de configuración como este:
+
+```yaml
+input_path: temp_Libro_de_codigos_Base_de_datos_Casen_2022(18marzo2024).xlsx
+output_report: reporte.pdf
+```
+
+El pipeline también puede ser importado y usado desde notebooks o scripts Python:
+
+```python
+from src.core import Pipeline
+from src.utils import load_config
+cfg = load_config('config.yml')
+pipeline = Pipeline(cfg)
+pipeline.run()
+```
+
+## Uso desde Streamlit (Wizard)
+
+Para una experiencia más interactiva y guiada, ejecuta la aplicación Streamlit:
+
+```bash
+streamlit run streamlit_app.py
+```
+
+### Características del Wizard Streamlit:
+
+1. **📁 Cargar archivo**: Soporta CSV, Excel, SPSS (.sav), Stata (.dta)
+2. **📊 Resumen de datos**: Estadísticas básicas y valores faltantes
+3. **🔍 Detección de tipos**: Análisis automático de tipos de datos
+4. **💡 Sugerencias**: Recomendaciones de visualización por tipo de dato
+5. **🎨 Selección de gráfico**: Interfaz para elegir tipo de visualización
+6. **📈 Visualización**: Generación de gráficos interactivos
+7. **💾 Exportar resultados**: Ejecución del pipeline completo y descarga de reporte PDF
+
+### Experiencia de usuario:
+- Navegación por pasos con barra lateral
+- Progreso visual del flujo
+- Interfaz intuitiva y responsive
+- Generación automática de reportes
+
+## CI
+El repositorio incluye integración continua (CI) para correr los tests automáticamente en cada push o pull request.
+
+---
+
+> **Nota:** Si necesitas datos de ejemplo o scripts adicionales, revisa la carpeta `data/` y los notebooks.
+
+## Arquitectura del proyecto
+
+### Pipeline Modular
+El proyecto utiliza una arquitectura modular que separa:
+- **Lógica de negocio**: En `src/steps.py`
+- **Orquestación**: En `src/core.py`
+- **Utilidades**: En `src/utils.py`
+- **Interfaz CLI**: En `src/cli.py`
+
+### Interfaz Streamlit
+La aplicación Streamlit (`streamlit_app.py`) proporciona:
+- Experiencia wizard de 7 pasos
+- Integración con el pipeline modular
+- Visualizaciones interactivas
+- Generación de reportes
+
+### Compatibilidad
+- **Formatos soportados**: CSV, Excel (.xls/.xlsx), SPSS (.sav), Stata (.dta)
+- **Configuración**: YAML y JSON
+- **Salidas**: PDF, gráficos, análisis estadísticos
+
 #  Procesamiento Estadístico + Frontend
 
 Una aplicación web completa para análisis estadístico de archivos `.sav` y `.dta` con interfaz moderna y funcionalidades avanzadas.
@@ -434,4 +577,47 @@ Para soporte técnico o preguntas:
 #### **Comparabilidad**
 - **Estandarización**: Métodos para comparación internacional
 - **Indicadores Compuestos**: Construcción de índices
-- **Validación Cruzada**: Verificación de robustez 
+- **Validación Cruzada**: Verificación de robustez
+
+---
+
+## 🤝 Agradecimientos y Reconocimientos
+
+Este proyecto se ha enriquecido gracias a la inspiración, ideas y herramientas de la comunidad open source. Agradecemos especialmente a los siguientes proyectos y autores:
+
+- **[pandas](https://pandas.pydata.org/)** y **[pyreadstat](https://github.com/Roche/pyreadstat)**: Carga y manipulación de datos en múltiples formatos.
+- **[missingno](https://github.com/ResidentMario/missingno)**: Visualización de valores faltantes.
+- **[scikit-learn](https://scikit-learn.org/)**: Imputación y procesamiento avanzado de datos.
+- **[dataprep](https://github.com/sfu-db/dataprep)**: Generación de reportes EDA interactivos.
+- **[statsmodels](https://www.statsmodels.org/)**: Modelos estadísticos y análisis de encuestas.
+- **[FPDF](https://pyfpdf.github.io/)**: Exportación de resultados a PDF.
+- **[LisaKey/convert-csv-to-sav](https://github.com/LisaKey/convert-csv-to-sav)**, **[jiogenes/predicting_missing_value](https://github.com/jiogenes/predicting_missing_value)**, **[Ree2612/csv-to-pdf-report-generator](https://github.com/Ree2612/csv-to-pdf-report-generator)**: Inspiración y ejemplos para robustecer la gestión de datos y reportes.
+
+Agradecemos a la comunidad de desarrolladores y científic@s de datos por compartir conocimiento y herramientas que hacen posible sistemas más robustos, transparentes y útiles para todos.
+
+---
+
+## Uso desde la línea de comandos (CLI)
+
+Puedes ejecutar el pipeline completo desde terminal usando:
+
+```bash
+python -m src.cli run --config config.yml
+```
+
+Donde `config.yml` es un archivo de configuración como este:
+
+```yaml
+input_path: temp_Libro_de_codigos_Base_de_datos_Casen_2022(18marzo2024).xlsx
+output_report: reporte.pdf
+```
+
+El pipeline también puede ser importado y usado desde notebooks o scripts Python:
+
+```python
+from src.core import Pipeline
+from src.utils import load_config
+cfg = load_config('config.yml')
+pipeline = Pipeline(cfg)
+pipeline.run()
+``` 

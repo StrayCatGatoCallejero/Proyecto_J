@@ -43,9 +43,7 @@ jobs:
     
     - name: Lint with flake8
       run: |
-        # stop the build if there are Python syntax errors or undefined names
         flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-        # exit-zero treats all errors as warnings
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     
     - name: Check code formatting with black
@@ -85,7 +83,6 @@ jobs:
     
     - name: Build documentation
       run: |
-        # Crear documentación básica si no existe
         if [ ! -d "docs" ]; then
           mkdir docs
           echo "# Pipeline de Encuestas" > docs/README.md
@@ -119,10 +116,7 @@ jobs:
     
     - name: Run security checks
       run: |
-        # Bandit para análisis de seguridad
         bandit -r estadistica/ -f json -o bandit-report.json || true
-        
-        # Safety para verificar vulnerabilidades en dependencias
         safety check --json --output safety-report.json || true
     
     - name: Upload security reports
@@ -154,14 +148,10 @@ jobs:
     
     - name: Create release
       run: |
-        # Crear tag de versión
         VERSION=$(date +%Y.%m.%d)
         git tag -a "v$VERSION" -m "Release version $VERSION"
         git push origin "v$VERSION"
     
     - name: Deploy to PyPI (if applicable)
       run: |
-        echo "Deployment to PyPI would happen here"
-        # pip install build twine
-        # python -m build
-        # twine upload dist/* 
+        echo "Deployment to PyPI would happen here" 

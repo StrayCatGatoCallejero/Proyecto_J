@@ -19,16 +19,24 @@ jobs:
       with:
         python-version: '3.11'
     
-    - name: Verify Python version
+    - name: Display Python version
       run: |
         python --version
-        python -c "import sys; assert sys.version_info >= (3, 11), f'Python 3.11+ required, got {sys.version}'"
+        python -c "import sys; print(f'Python {sys.version}')"
     
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
     
+    - name: Run verification script
+      run: |
+        python check_python_version.py
+    
     - name: Run basic tests
       run: |
-        python check_python_version.py 
+        python -c "import streamlit, pandas, plotly, scipy, sklearn; print('✅ All main dependencies imported successfully')"
+    
+    - name: Simple linting
+      run: |
+        flake8 . --max-line-length=127 --ignore=E203,W503,E501 || echo "Linting completed with warnings" 

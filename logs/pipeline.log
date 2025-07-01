@@ -1,2 +1,221 @@
 2025-06-27 02:00:36,297 - orchestrator.pipeline_orchestrator - INFO - Configuration loaded from config/config.yml
 2025-06-27 02:00:36,301 - orchestrator.pipeline_orchestrator - INFO - Pipeline Orchestrator initialized
+2025-06-28 01:55:48,460 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 01:55:48,470 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 1 errores, 0 advertencias
+2025-06-28 01:55:48,492 - pipeline - WARNING - [business_rules] validate_likert: Validación Likert pregunta_1_likert: 0 errores, 1 advertencias
+2025-06-28 01:55:48,513 - pipeline - WARNING - [business_rules] validate_likert: Validación Likert pregunta_1_likert: 1 errores, 1 advertencias
+2025-06-28 01:55:48,523 - pipeline - INFO - [business_rules] validate_likert: Validación Likert pregunta_1_likert: 0 errores, 0 advertencias
+2025-06-28 01:55:48,533 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:55:48,537 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:55:48,549 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 01:55:48,562 - pipeline - WARNING - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 1 errores, 2 advertencias
+2025-06-28 01:55:48,576 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 01:55:48,579 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:55:48,583 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 01:55:48,584 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 1 errores, 0 advertencias
+2025-06-28 01:55:48,592 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 1 errores, 0 advertencias
+2025-06-28 01:55:48,596 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:55:48,598 - pipeline - WARNING - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 1 advertencias
+2025-06-28 01:55:48,598 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 2 errores, 1 advertencias
+2025-06-28 01:55:48,612 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 01:55:48,614 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:55:48,618 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 01:55:48,619 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 1 errores, 0 advertencias
+2025-06-28 01:55:48,630 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 1 errores, 0 advertencias
+2025-06-28 01:55:48,633 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:55:48,635 - pipeline - WARNING - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 1 advertencias
+2025-06-28 01:55:48,636 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 2 errores, 1 advertencias
+2025-06-28 01:56:23,791 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 01:56:23,799 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 1 errores, 0 advertencias
+2025-06-28 01:56:23,825 - pipeline - WARNING - [business_rules] validate_likert: Validación Likert pregunta_1_likert: 0 errores, 1 advertencias
+2025-06-28 01:56:23,841 - pipeline - WARNING - [business_rules] validate_likert: Validación Likert pregunta_1_likert: 1 errores, 1 advertencias
+2025-06-28 01:56:23,848 - pipeline - INFO - [business_rules] validate_likert: Validación Likert pregunta_1_likert: 0 errores, 0 advertencias
+2025-06-28 01:56:23,855 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:56:23,860 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:56:23,869 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 01:56:23,886 - pipeline - WARNING - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 1 errores, 2 advertencias
+2025-06-28 01:56:23,902 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 01:56:23,905 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:56:23,910 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 01:56:23,911 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 1 errores, 0 advertencias
+2025-06-28 01:56:23,923 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 1 errores, 0 advertencias
+2025-06-28 01:56:23,926 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:56:23,930 - pipeline - WARNING - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 1 advertencias
+2025-06-28 01:56:23,931 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 2 errores, 1 advertencias
+2025-06-28 01:56:23,944 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 01:56:23,945 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:56:23,950 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 01:56:23,950 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 1 errores, 0 advertencias
+2025-06-28 01:56:23,966 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 1 errores, 0 advertencias
+2025-06-28 01:56:23,971 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 01:56:23,974 - pipeline - WARNING - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 1 advertencias
+2025-06-28 01:56:23,976 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 2 errores, 1 advertencias
+2025-06-28 08:46:25,913 - pipeline - WARNING - [business_rules] validate_demographics: Validación demográfica: 3 errores, 1 advertencias
+2025-06-28 08:46:25,929 - pipeline - WARNING - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 1 advertencias
+2025-06-28 08:46:25,930 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 2 reglas, 1 errores, 1 advertencias
+2025-06-28 08:46:25,959 - pipeline - WARNING - [business_rules] validate_demographics: Validación demográfica: 3 errores, 1 advertencias
+2025-06-28 08:46:25,967 - pipeline - WARNING - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 1 advertencias
+2025-06-28 08:46:25,969 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 2 reglas, 1 errores, 1 advertencias
+2025-06-28 08:46:25,985 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 08:46:25,998 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 08:46:25,998 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 08:46:25,999 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 1 errores, 0 advertencias
+2025-06-28 08:46:26,019 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 08:46:26,092 - pipeline - INFO - [business_rules] validate_likert: Validación Likert pregunta_1_likert: 1 errores, 0 advertencias
+2025-06-28 08:46:26,171 - pipeline - INFO - [business_rules] validate_likert: Validación Likert pregunta_2_likert: 0 errores, 0 advertencias
+2025-06-28 08:46:26,353 - pipeline - INFO - [business_rules] validate_likert: Validación Likert pregunta_3_likert: 0 errores, 0 advertencias
+2025-06-28 08:46:26,380 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 08:46:26,415 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 5 reglas, 1 errores, 0 advertencias
+2025-06-28 08:46:26,720 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 08:46:26,742 - pipeline - INFO - [business_rules] validate_likert: Validación Likert pregunta_1_likert: 1 errores, 0 advertencias
+2025-06-28 08:46:26,763 - pipeline - INFO - [business_rules] validate_likert: Validación Likert pregunta_2_likert: 0 errores, 0 advertencias
+2025-06-28 08:46:26,785 - pipeline - INFO - [business_rules] validate_likert: Validación Likert pregunta_3_likert: 0 errores, 0 advertencias
+2025-06-28 08:46:26,788 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 08:46:26,790 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 5 reglas, 1 errores, 0 advertencias
+2025-06-28 08:46:26,813 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-28 08:46:26,820 - pipeline - INFO - [business_rules] validate_geography: Validación geográfica: 2 errores, 0 advertencias
+2025-06-28 08:46:26,821 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-28 08:46:26,824 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 3 reglas, 1 errores, 0 advertencias
+2025-06-28 08:46:26,868 - pipeline - WARNING - [business_rules] validate_demographics: Validación demográfica: 3 errores, 1 advertencias
+2025-06-28 08:46:26,875 - pipeline - WARNING - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 1 advertencias
+2025-06-28 08:46:26,877 - pipeline - ERROR - [business_rules] validate_business_rules: Validación de reglas de negocio: 2 reglas, 1 errores, 1 advertencias
+2025-06-29 19:07:28,579 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-29 19:07:28,600 - pipeline - WARNING - [business_rules] validate_likert: Validación Likert pregunta_1_likert: 0 errores, 1 advertencias
+2025-06-29 19:07:28,612 - pipeline - WARNING - [business_rules] validate_likert: Validación Likert pregunta_2_likert: 0 errores, 1 advertencias
+2025-06-29 19:07:28,619 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-29 19:07:28,620 - pipeline - INFO - [business_rules] validate_business_rules: Validación de reglas de negocio: 4 reglas, 0 errores, 0 advertencias
+2025-06-29 19:07:28,621 - json_pipeline_5b64280c-41f5-4de6-8802-644726b50e3e - INFO - {
+  "timestamp": "2025-06-29T23:07:28.620988+00:00",
+  "level": "INFO",
+  "message": "Business rules validation: 4 executed, 0 failed",
+  "session_id": "5b64280c-41f5-4de6-8802-644726b50e3e",
+  "module": "business_rules",
+  "function": "validate_business_rules",
+  "step": "business_rules",
+  "category": "business_rules",
+  "execution_time": 0.09549856185913086,
+  "before_metrics": {
+    "rules_executed": 4
+  },
+  "after_metrics": {
+    "rules_failed": 0,
+    "rules_warnings": 0,
+    "success_rate": 1.0
+  },
+  "parameters": {
+    "rules_executed": 4
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "business_rules",
+    "validation"
+  ],
+  "metadata": {
+    "validation_results": [
+      "demographics",
+      "likert",
+      "likert",
+      "cross_consistency"
+    ],
+    "failed_rules": [],
+    "warning_rules": []
+  }
+}
+2025-06-29 19:07:28,657 - json_pipeline_36a393c3-0b2d-483d-b063-393c0e69afa4 - INFO - {
+  "timestamp": "2025-06-29T23:07:28.657269+00:00",
+  "level": "INFO",
+  "message": "JSON Logger initialized",
+  "session_id": "36a393c3-0b2d-483d-b063-393c0e69afa4",
+  "module": "system",
+  "function": "system_event",
+  "step": "system",
+  "category": "system",
+  "execution_time": 0.0,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {},
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [],
+  "metadata": {
+    "session_id": "36a393c3-0b2d-483d-b063-393c0e69afa4"
+  }
+}
+2025-06-29 19:07:28,660 - json_pipeline_36a393c3-0b2d-483d-b063-393c0e69afa4 - INFO - {
+  "timestamp": "2025-06-29T23:07:28.659783+00:00",
+  "level": "INFO",
+  "message": "Ejemplo de log estructurado",
+  "session_id": "36a393c3-0b2d-483d-b063-393c0e69afa4",
+  "module": "ejemplo",
+  "function": "ejemplo_formato_json",
+  "step": "demonstration",
+  "category": "system",
+  "execution_time": 1.5,
+  "before_metrics": {
+    "rows": 100,
+    "columns": 10
+  },
+  "after_metrics": {
+    "processed_rows": 95,
+    "errors": 5
+  },
+  "parameters": {
+    "param1": "valor1",
+    "param2": 42
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": "usuario_ejemplo",
+  "request_id": "req_12345",
+  "correlation_id": "corr_67890",
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "ejemplo",
+    "demo"
+  ],
+  "metadata": {
+    "version": "1.0",
+    "environment": "development"
+  }
+}
+2025-06-29 22:01:15,856 - pipeline - INFO - [business_rules] validate_demographics: Validación demográfica: 0 errores, 0 advertencias
+2025-06-29 22:01:15,857 - pipeline - INFO - [business_rules] validate_cross_consistency: Validación de consistencia cruzada: 0 errores, 0 advertencias
+2025-06-29 22:01:15,858 - pipeline - INFO - [business_rules] validate_business_rules: Validación de reglas de negocio: 2 reglas, 0 errores, 0 advertencias
+2025-06-29 22:01:15,859 - pipeline_2fedf144-ddab-428e-86e9-ea0554cf5fe8 - INFO - {"timestamp": "2025-06-30T02:01:15.859386+00:00", "session_id": "2fedf144-ddab-428e-86e9-ea0554cf5fe8", "system_info": {"platform": "Windows-11-10.0.26100-SP0", "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]", "cpu_count": 8, "memory_total": 8419024896, "process_id": 17716}, "level": "INFO", "event": "step", "message": "Validación de reglas de negocio: 2/2 pasaron", "module": "orchestrator.pipeline_orchestrator", "function": "validate_business_rules", "step": "business_rules_validation", "category": "business_rules", "parameters": {"total_rules": 2}, "before_metrics": {"total_rules": 2}, "after_metrics": {"rules_failed": 0, "rules_warnings": 0, "success_rate": 1.0}, "execution_time": 0.0, "tags": ["business_rules", "validation"], "metadata": {"validation_results": ["demographics", "cross_consistency"], "failed_rules": [], "warning_rules": []}}
+2025-06-29 22:01:15,889 - pipeline_2fedf144-ddab-428e-86e9-ea0554cf5fe8 - INFO - {"timestamp": "2025-06-30T02:01:15.889225+00:00", "session_id": "2fedf144-ddab-428e-86e9-ea0554cf5fe8", "system_info": {"platform": "Windows-11-10.0.26100-SP0", "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]", "cpu_count": 8, "memory_total": 8419024896, "process_id": 17716}, "level": "INFO", "event": "step", "message": "Aplicando filtros: 2 filtros", "module": "orchestrator.pipeline_orchestrator", "function": "apply_filters", "step": "data_filtering", "category": "processing", "parameters": {"filters_count": 2}, "before_metrics": {"initial_rows": 50}, "after_metrics": {"initial_rows": 50}, "execution_time": 0.0, "tags": ["filtering", "data_processing"], "metadata": {"filters": {"edad": {"min": 18, "max": 65}, "educacion": {"values": ["Secundaria", "Universitaria"]}}}}
+2025-06-29 22:01:15,892 - processing.filters - WARNING - Column None not found in DataFrame
+2025-06-29 22:01:15,893 - processing.filters - WARNING - Column None not found in DataFrame
+2025-06-29 22:01:15,893 - pipeline_2fedf144-ddab-428e-86e9-ea0554cf5fe8 - INFO - {"timestamp": "2025-06-30T02:01:15.893845+00:00", "session_id": "2fedf144-ddab-428e-86e9-ea0554cf5fe8", "system_info": {"platform": "Windows-11-10.0.26100-SP0", "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]", "cpu_count": 8, "memory_total": 8419024896, "process_id": 17716}, "level": "INFO", "event": "step", "message": "Filtrado completado: 0 filas removidas", "module": "orchestrator.pipeline_orchestrator", "function": "apply_filters", "step": "data_filtering", "category": "processing", "parameters": {"filters_applied": 2}, "before_metrics": {"initial_rows": 50}, "after_metrics": {"final_rows": 50, "rows_removed": 0, "removal_percentage": 0.0}, "execution_time": 0.0, "tags": ["filtering", "data_processing", "success"], "metadata": {"filters": {"edad": {"min": 18, "max": 65}, "educacion": {"values": ["Secundaria", "Universitaria"]}}}}
+2025-06-29 22:01:15,918 - pipeline_2fedf144-ddab-428e-86e9-ea0554cf5fe8 - INFO - {"timestamp": "2025-06-30T02:01:15.918739+00:00", "session_id": "2fedf144-ddab-428e-86e9-ea0554cf5fe8", "system_info": {"platform": "Windows-11-10.0.26100-SP0", "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]", "cpu_count": 8, "memory_total": 8419024896, "process_id": 17716}, "level": "INFO", "event": "step", "message": "Analysis statistical_analysis completed", "module": "analysis", "function": "run_statistical_analysis", "step": "analysis", "category": "analysis", "parameters": {"analysis_type": "statistical_analysis"}, "before_metrics": {"input_size": 50}, "after_metrics": {"output_size": 0}, "execution_time": 0.0, "tags": ["analysis", "statistical_analysis"], "metadata": {"results": {"dataset_size": 50}}}
+2025-06-29 22:01:15,985 - pipeline_2fedf144-ddab-428e-86e9-ea0554cf5fe8 - INFO - {"timestamp": "2025-06-30T02:01:15.985593+00:00", "session_id": "2fedf144-ddab-428e-86e9-ea0554cf5fe8", "system_info": {"platform": "Windows-11-10.0.26100-SP0", "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]", "cpu_count": 8, "memory_total": 8419024896, "process_id": 17716}, "level": "INFO", "event": "step", "message": "Analysis visualization_generation completed", "module": "analysis", "function": "generate_visualizations", "step": "analysis", "category": "analysis", "parameters": {"analysis_type": "visualization_generation"}, "before_metrics": {"input_size": 5}, "after_metrics": {"output_size": 0}, "execution_time": 0.0, "tags": ["analysis", "visualization_generation"], "metadata": {"results": {"variables_to_visualize": 5}}}
+2025-06-29 22:01:18,785 - pipeline_2fedf144-ddab-428e-86e9-ea0554cf5fe8 - INFO - {"timestamp": "2025-06-30T02:01:18.785900+00:00", "session_id": "2fedf144-ddab-428e-86e9-ea0554cf5fe8", "system_info": {"platform": "Windows-11-10.0.26100-SP0", "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]", "cpu_count": 8, "memory_total": 8419024896, "process_id": 17716}, "level": "INFO", "event": "system", "message": "Pipeline execution completed successfully", "metadata": {"total_steps": 6, "completed_steps": 12, "failed_steps": 0, "pipeline_execution_time": 3.133349895477295, "session_id": "2fedf144-ddab-428e-86e9-ea0554cf5fe8"}}

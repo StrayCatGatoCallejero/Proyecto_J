@@ -1,366 +1,296 @@
-# Proyecto J - Sistema Integral de Análisis de Datos para Ciencias Sociales
+# Proyecto J - Sistema de Análisis de Datos para Ciencias Sociales
 
-[![Python](https://img.shields.io/badge/Python-3.11-blue.svg)](https://www.python.org/downloads/)
-[![Streamlit](https://img.shields.io/badge/Streamlit-1.28+-red.svg)](https://streamlit.io/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![CI](https://github.com/tu_usuario/proyecto_j/actions/workflows/ci.yml/badge.svg)](https://github.com/tu_usuario/proyecto_j/actions)
+Un sistema completo y robusto para análisis de datos en ciencias sociales, encuestas y demografía, con capacidades avanzadas de procesamiento, visualización y logging estructurado.
 
-> **Una plataforma completa de análisis de datos especializada en ciencias sociales, encuestas y estudios demográficos con interfaces modernas y funcionalidades avanzadas.**
+## 🏗️ Estructura del Proyecto
 
-## Características Principales
+```
+Proyecto_J/
+├── README.md                    # Documentación principal
+├── pyproject.toml              # Configuración del proyecto
+├── requirements.txt            # Dependencias principales
+├── runtime.txt                 # Versión de Python
+├── .python-version             # Versión específica de Python
+├── .flake8                     # Configuración de linting
+├── mypy.ini                    # Configuración de type checking
+├── __init__.py                 # Inicialización del paquete
+│
+├── src_folder/                 # Código fuente principal
+│   ├── streamlit_app.py        # Aplicación Streamlit principal
+│   └── streamlit_app_backup.py # Backup de la aplicación
+│
+├── processing/                 # Módulos de procesamiento de datos
+│   ├── __init__.py
+│   ├── io.py                   # Operaciones de entrada/salida
+│   ├── stats.py                # Análisis estadístico
+│   ├── filters.py              # Filtros de datos
+│   ├── business_rules.py       # Reglas de negocio
+│   ├── business_error_handler.py # Manejo de errores de negocio
+│   ├── json_logging.py         # Sistema de logging JSON
+│   ├── config_manager.py       # Gestión de configuración
+│   ├── data_validators.py      # Validación de datos
+│   ├── features.py             # Generación de features
+│   ├── visualization.py        # Generación de visualizaciones
+│   └── ...
+│
+├── orchestrator/               # Orquestadores de pipeline
+│   ├── __init__.py
+│   └── pipeline_orchestrator.py # Orquestador principal
+│
+├── config/                     # Configuraciones
+│   └── config.yml              # Configuración principal
+│
+├── examples/                   # Ejemplos y demostraciones
+│   ├── ejemplo_*.py            # Scripts de ejemplo
+│   ├── test_*.py               # Tests de ejemplo
+│   ├── app_*.py                # Aplicaciones de ejemplo
+│   ├── social_sciences_*.py    # Análisis de ciencias sociales
+│   ├── wizard_*.py             # Asistentes interactivos
+│   └── asistente_*.py          # Asistentes de análisis
+│
+├── scripts/                    # Scripts utilitarios
+│   ├── install.sh              # Instalación en Linux/macOS
+│   ├── install.bat             # Instalación en Windows
+│   ├── check_python_version.py # Verificación de versión
+│   ├── tasks.py                # Tareas automatizadas
+│   └── requirements_*.txt      # Dependencias específicas
+│
+├── docs/                       # Documentación extendida
+│   ├── README_*.md             # Documentación específica
+│   ├── RESUMEN_*.md            # Resúmenes técnicos
+│   └── REPORTE_*.md            # Reportes de análisis
+│
+├── data_folder/                # Datos de ejemplo y archivos
+│   ├── *.csv                   # Datos en formato CSV
+│   ├── *.xlsx                  # Datos en formato Excel
+│   ├── *.png                   # Imágenes generadas
+│   └── ...
+│
+├── notebooks/                  # Jupyter notebooks
+│   └── *.ipynb                 # Notebooks de análisis
+│
+├── tests/                      # Tests automáticos
+│   ├── test_*.py               # Tests unitarios
+│   ├── e2e/                    # Tests end-to-end
+│   └── ...
+│
+├── logs/                       # Logs y reportes
+│   ├── *.json                  # Logs JSON estructurados
+│   ├── *.log                   # Logs de texto
+│   └── *.xml                   # Reportes de cobertura
+│
+├── proyecto_j/                 # Código fuente adicional
+│   ├── src/                    # Módulos adicionales
+│   ├── tests/                  # Tests adicionales
+│   ├── data/                   # Datos adicionales
+│   └── ...
+│
+└── temp/                       # Archivos temporales
+    └── ...
+```
 
-### Análisis Estadístico Completo
-- **Estadísticas descriptivas** avanzadas con interpretación automática
-- **Análisis de correlaciones** Pearson y Spearman con heatmaps interactivos
-- **Tablas de contingencia** con análisis χ² completo
-- **Regresión múltiple** con validación de supuestos
-- **Análisis de valores perdidos** con estrategias de imputación
-
-### Especializado en Ciencias Sociales
-- **Clasificación semántica automática** de variables de encuesta
-- **Detección de escalas Likert** y ordinales
-- **Normalización inteligente** de categorías con fuzzy matching
-- **Validación de consistencia** lógica entre variables
-- **Análisis de texto libre** con nubes de palabras
-
-### Visualizaciones Avanzadas
-- **15+ tipos de gráficos** interactivos con Plotly
-- **Sugerencias automáticas** de visualización por tipo de dato
-- **Paneles completos** de análisis multivariado
-- **Exportación profesional** en múltiples formatos
-- **Diseño responsive** para diferentes dispositivos
-
-### Pipeline Automatizado
-- **Procesamiento modular** con orquestador inteligente
-- **Soporte multi-formato** (CSV, Excel, SPSS, Stata)
-- **Validaciones específicas** para datos chilenos
-- **Generación automática** de reportes en PDF y HTML
-- **Sistema de logging** completo
-
-## Instalación Rápida
+## 🚀 Instalación
 
 ### Requisitos Previos
+- Python 3.11.7 o superior
+- pip o conda
+
+### Instalación Rápida
+
+**Windows:**
 ```bash
-Python 3.11 o superior (recomendado Python 3.11.7)
+scripts\install.bat
 ```
 
-### Instalación con pip
+**Linux/macOS:**
 ```bash
-# Clonar el repositorio
-git clone https://github.com/tu_usuario/proyecto_j.git
-cd proyecto_j
+chmod +x scripts/install.sh
+./scripts/install.sh
+```
 
-# Crear entorno virtual con Python 3.11
-python3.11 -m venv venv
-source venv/bin/activate  # En Windows: venv\Scripts\activate
-
-# Instalar dependencias
+**Manual:**
+```bash
 pip install -r requirements.txt
-
-# Ejecutar la aplicación principal
-streamlit run app_front.py
-```
-
-### Instalación con conda
-```bash
-# Crear entorno conda con Python 3.11
-conda env create -f environment.yml
-conda activate proyecto_j
-
-# Ejecutar aplicación
-streamlit run app_front.py
 ```
 
 ### Verificación de Instalación
 ```bash
-# Verificar versión de Python
-python --version  # Debe mostrar Python 3.11.x
-
-# Verificar instalación de dependencias
-python -c "import streamlit, pandas, plotly, scipy; print('✅ Todas las dependencias instaladas correctamente')"
+python scripts/check_python_version.py
 ```
 
-## Aplicaciones Disponibles
+## 📖 Uso
 
-### 1. Aplicación Principal (`app_front.py`)
-**Interfaz unificada con 7 secciones especializadas**
+### Aplicación Principal (Streamlit)
 ```bash
-streamlit run app_front.py
+streamlit run src_folder/streamlit_app.py
 ```
 
-**Características:**
-- **Filtros dinámicos** por rango y categoría
-- **Estadísticas básicas** completas
-- **Análisis de correlaciones** avanzado
-- **Tablas de contingencia** con χ²
-- **Visualizaciones avanzadas** (15+ tipos)
-- **Análisis de ciencias sociales** especializado
-- **Exportación** en múltiples formatos
+### Ejemplos de Uso
 
-### 2. Estadísticas Avanzadas (`app_estadistica_avanzada.py`)
-**Análisis estadístico completo con interfaz moderna**
+**Análisis de Encuestas:**
 ```bash
-streamlit run app_estadistica_avanzada.py
+python examples/ejemplo_sistema_completo_final.py
 ```
 
-### 3. Análisis de Encuestas (`app_encuestas.py`)
-**Procesamiento especializado para datos de encuestas**
+**Análisis de Ciencias Sociales:**
 ```bash
-streamlit run app_encuestas.py
+python examples/social_sciences_analyzer.py
 ```
 
-### 4. Wizard Interactivo (`wizard_streamlit.py`)
-**Guía paso a paso para análisis completo**
+**Pipeline de Datos:**
 ```bash
-streamlit run wizard_streamlit.py
+python examples/ejemplo_pipeline_json_logging.py
 ```
 
-### 5. Ciencias Sociales (`social_sciences_streamlit.py`)
-**Análisis especializado para investigación social**
-```bash
-streamlit run social_sciences_streamlit.py
-```
+## 🔧 Características Principales
 
-## Uso Básico
+### 1. Sistema de Logging JSON Robusto
+- Logs estructurados en formato JSON
+- Rotación automática de archivos
+- Compatible con ELK Stack, Datadog, Prometheus
+- Métricas detalladas de ejecución
+- Manejo robusto de serialización
 
-### Análisis Simple desde Python
-```python
-from social_sciences_analyzer import analyze_survey_data
-import pandas as pd
+### 2. Manejo de Errores de Negocio
+- Extracción automática de errores de logs
+- Visualización en Streamlit
+- Exportación de reportes
+- Categorización por tipo de error
 
-# Cargar datos
-df = pd.read_csv('mi_encuesta.csv')
+### 3. Pipeline de Procesamiento
+- Orquestador modular y extensible
+- Validación de esquemas
+- Aplicación de reglas de negocio
+- Análisis estadístico automático
+- Generación de visualizaciones
 
-# Análisis automático
-results = analyze_survey_data(df)
+### 4. Configuración Flexible
+- Configuración centralizada en YAML
+- Variables de entorno
+- Configuración por ambiente
 
-# Ver resumen
-print(results['semantic_classification'])
-```
+## 📊 Logging y Monitoreo
 
-### Análisis con Configuración Personalizada
-```python
-from social_sciences_analyzer import SocialSciencesAnalyzer
+### Ubicación de Logs
+- **Logs JSON:** `logs/pipeline.json`
+- **Logs de texto:** `logs/pipeline.log`
+- **Reportes:** `logs/coverage.xml`
 
-# Diccionario personalizado
-custom_dict = {
-    'escalas_especializadas': {
-        'satisfaccion_vida': ['satisfaccion_vida', 'felicidad', 'bienestar'],
-        'confianza_institucional': ['confianza_gobierno', 'confianza_congreso']
-    }
+### Estructura de Logs JSON
+```json
+{
+  "level": "INFO",
+  "event": "step",
+  "message": "Paso completado",
+  "module": "pipeline_orchestrator",
+  "function": "run_pipeline",
+  "step": "data_loading",
+  "category": "data_load",
+  "parameters": {...},
+  "before_metrics": {...},
+  "after_metrics": {...},
+  "execution_time": 0.25,
+  "tags": ["pipeline", "data"],
+  "metadata": {...},
+  "timestamp": "2025-06-30T04:53:18.989911+00:00",
+  "session_id": "pipeline_20250630_005318",
+  "system_info": {...}
 }
-
-# Crear analizador
-analyzer = SocialSciencesAnalyzer(custom_dict)
-
-# Analizar datos
-results = analyzer.analyze_dataframe(df)
 ```
 
-### Pipeline Completo desde CLI
-```bash
-python -m proyecto_j.src.cli run --config config/config.yml
-```
+### Visualización de Logs
 
-## Casos de Uso
+**Kibana:**
+- Importar logs desde `logs/pipeline.json`
+- Crear dashboards con filtros por `step`, `level`, `session_id`
 
-### Encuestas de Satisfacción
+**Grafana:**
+- Configurar fuente de datos JSON
+- Crear paneles con métricas de `execution_time`, `success_rate`
+
+**Python:**
 ```python
-# El sistema detectará automáticamente:
-# - Escalas Likert de satisfacción
-# - Variables demográficas
-# - Texto libre de comentarios
-# - Sugerirá visualizaciones apropiadas
+import json
+from processing.json_logging import JsonLogger
+
+# Leer logs
+with open('logs/pipeline.json', 'r') as f:
+    logs = [json.loads(line) for line in f]
+
+# Analizar métricas
+execution_times = [log['execution_time'] for log in logs if 'execution_time' in log]
 ```
 
-### Estudios Demográficos
-```python
-# Funcionalidades especiales:
-# - Normalización de categorías de género
-# - Detección de inconsistencias edad/estado civil
-# - Clasificación de variables socioeconómicas
-# - Análisis de distribución geográfica
-```
-
-### Investigación Política
-```python
-# Características específicas:
-# - Escalas de confianza institucional
-# - Análisis de participación política
-# - Procesamiento de respuestas abiertas
-# - Detección de sentimientos en texto
-```
-
-## Configuración Avanzada
-
-### Diccionario Semántico Personalizado
-```yaml
-# config/config.yml
-semantic_dictionary:
-  mi_categoria:
-    mi_subcategoria:
-      - termino1
-      - termino2
-      - termino3
-```
-
-### Umbrales de Configuración
-```python
-# En la interfaz de Streamlit:
-# - Umbral de Similitud: 50-95% (default: 80%)
-# - Umbral de Confianza: 50-95% (default: 70%)
-```
-
-### Validaciones para Chile
-```python
-# Validaciones específicas incluidas:
-# - Regiones y comunas chilenas
-# - Indicadores socioeconómicos
-# - Validaciones demográficas
-```
-
-## Visualizaciones Disponibles
-
-### Gráficos Automáticos
-- **Barras horizontales** - Para variables categóricas
-- **Gráficos de pastel** - Para distribuciones demográficas
-- **Histogramas** - Para variables continuas
-- **Barras apiladas** - Para escalas Likert
-- **Nubes de palabras** - Para texto libre
-- **Gráficos de líneas** - Para datos temporales
-- **Boxplots** - Para distribución de variables
-- **Scatter plots** - Para relaciones bivariadas
-- **Heatmaps** - Para correlaciones múltiples
-- **Violin plots** - Para distribuciones completas
-
-### Personalización
-- **Colores temáticos** por categoría
-- **Tooltips informativos** con metadatos
-- **Interactividad completa** con Plotly
-- **Exportación** en múltiples formatos
-
-## Arquitectura del Proyecto
-
-```
-proyecto_j/
-├── Aplicaciones Principales
-│   ├── app_front.py              # Aplicación principal
-│   ├── app_estadistica_avanzada.py
-│   ├── app_encuestas.py
-│   ├── wizard_streamlit.py
-│   └── social_sciences_streamlit.py
-├── Módulos de Procesamiento
-│   ├── processing/               # Pipeline de procesamiento
-│   ├── orchestrator/             # Orquestador principal
-│   └── proyecto_j/src/           # Módulos especializados
-├── Datos y Configuración
-│   ├── config/                   # Configuraciones
-│   ├── data/                     # Datos de ejemplo
-│   └── logs/                     # Registros
-└── Testing y Documentación
-    ├── tests/                    # Pruebas automatizadas
-    ├── notebooks/                # Jupyter notebooks
-    └── docs/                     # Documentación
-```
-
-## Testing
+## 🧪 Testing
 
 ### Ejecutar Tests
 ```bash
-# Tests completos
+# Tests unitarios
 pytest tests/
 
-# Con cobertura
-pytest --cov=proyecto_j tests/
+# Tests con cobertura
+pytest --cov=processing --cov=orchestrator tests/
 
-# Tests específicos
-pytest tests/test_pipeline.py
-pytest tests/test_column_inspector.py
+# Tests end-to-end
+pytest tests/e2e/
 ```
 
-### Linting
+### Verificar Calidad de Código
 ```bash
-# Verificar estilo de código
-flake8 proyecto_j/
+# Linting
+flake8 .
 
-# Formatear código
-black proyecto_j/
+# Type checking
+mypy .
+
+# Formateo
+black .
 ```
 
-## Dependencias Principales
+## 📚 Documentación
 
-```txt
-# Análisis de datos
-pandas>=1.5.0
-numpy>=1.21.0
-scipy>=1.9.0
-scikit-learn>=1.1.0
+- **README.md** - Documentación principal
+- **docs/README_*.md** - Documentación específica por módulo
+- **docs/RESUMEN_*.md** - Resúmenes técnicos
+- **docs/REPORTE_*.md** - Reportes de análisis
 
-# Visualización
-plotly>=5.0.0
-matplotlib>=3.5.0
-wordcloud>=1.9.0
+## 🤝 Contribución
 
-# Interfaz web
-streamlit>=1.28.0
+1. Fork el proyecto
+2. Crea una rama para tu feature (`git checkout -b feature/AmazingFeature`)
+3. Commit tus cambios (`git commit -m 'Add some AmazingFeature'`)
+4. Push a la rama (`git push origin feature/AmazingFeature`)
+5. Abre un Pull Request
 
-# Procesamiento de archivos
-openpyxl>=3.0.0
-pyreadstat>=1.1.0
+### Estándares de Código
+- Seguir PEP 8
+- Incluir docstrings
+- Escribir tests para nuevas funcionalidades
+- Usar type hints
 
-# Análisis estadístico
-statsmodels
-missingno
+## 📄 Licencia
 
-# Reportes
-fpdf2==2.5.6
-```
+Este proyecto está bajo la Licencia MIT. Ver el archivo `LICENSE` para más detalles.
 
-## Contribuir
+## 🆘 Soporte
 
-### Cómo Contribuir
-1. **Fork** el proyecto
-2. **Crea** una rama para tu feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** tus cambios (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** a la rama (`git push origin feature/AmazingFeature`)
-5. **Abre** un Pull Request
+Para soporte técnico o preguntas:
+- Revisar la documentación en `docs/`
+- Ejecutar ejemplos en `examples/`
+- Verificar logs en `logs/`
 
-### Guías de Contribución
-- **Sigue** las convenciones de código existentes
-- **Añade tests** para nuevas funcionalidades
-- **Actualiza** la documentación según sea necesario
-- **Verifica** que todos los tests pasen
+## 🔄 Changelog
 
-## Licencia
-
-Este proyecto está bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
-
-## Agradecimientos
-
-- **Streamlit** por la excelente plataforma de desarrollo
-- **Plotly** por las visualizaciones interactivas
-- **Pandas** por el procesamiento de datos
-- **Comunidad de Python** por las herramientas de análisis estadístico
-
-## Contacto
-
-- **Proyecto:** [Proyecto J](https://github.com/tu_usuario/proyecto_j)
-- **Issues:** [GitHub Issues](https://github.com/tu_usuario/proyecto_j/issues)
-- **Discusiones:** [GitHub Discussions](https://github.com/tu_usuario/proyecto_j/discussions)
-
-## Estadísticas del Proyecto
-
-- **Stars:** [![GitHub stars](https://img.shields.io/github/stars/tu_usuario/proyecto_j.svg)](https://github.com/tu_usuario/proyecto_j/stargazers)
-- **Forks:** [![GitHub forks](https://img.shields.io/github/forks/tu_usuario/proyecto_j.svg)](https://github.com/tu_usuario/proyecto_j/network)
-- **Issues:** [![GitHub issues](https://img.shields.io/github/issues/tu_usuario/proyecto_j.svg)](https://github.com/tu_usuario/proyecto_j/issues)
-- **Releases:** [![GitHub release](https://img.shields.io/github/release/tu_usuario/proyecto_j.svg)](https://github.com/tu_usuario/proyecto_j/releases)
+### v2.0.0 (2025-06-30)
+- ✅ Reestructuración completa del proyecto
+- ✅ Sistema de logging JSON robusto
+- ✅ Manejo avanzado de errores de negocio
+- ✅ Pipeline orquestador modular
+- ✅ Serialización robusta para todos los tipos de datos
+- ✅ Documentación completa y ejemplos
+- ✅ Compatibilidad con Python 3.11+
+- ✅ Tests automatizados y CI/CD
 
 ---
 
-<div align="center">
-
-**¿Te gustó el proyecto? ¡Dale una estrella!**
-
-*Desarrollado para la comunidad de ciencias sociales*
-
-</div> 
+**Proyecto J** - Transformando el análisis de datos en ciencias sociales con tecnología moderna y robusta. 

@@ -19,23 +19,19 @@ __author__ = "Proyecto J Team"
 
 __all__ = [
     # Schema validation
-    'validate_schema',
-    'SchemaValidationError',
-    
+    "validate_schema",
+    "SchemaValidationError",
     # Filter management
-    'apply_filters', 
-    'revert_last',
-    'FilterManager',
-    
+    "apply_filters",
+    "revert_last",
+    "FilterManager",
     # Integrity checking
-    'validate_integrity',
-    'IntegrityWarning',
-    
+    "validate_integrity",
+    "IntegrityWarning",
     # Data cleaning
-    'clean_data',
-    'DataCleaningReport',
-    
+    "clean_data",
+    "DataCleaningReport",
     # Logging
-    'log_action',
-    'get_action_log'
-] 
+    "log_action",
+    "get_action_log",
+]

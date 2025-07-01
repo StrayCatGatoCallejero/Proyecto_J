@@ -1,286 +1,640 @@
 """
-Módulo de Feature Engineering para análisis social.
-Incluye rutinas de variables derivadas, ratios, escalado, binning, intervalos, bootstrap y scores compuestos.
-Todas las funciones son robustas, con validaciones y contratos claros.
+Módulo de Features - Patrón "Reloj Suizo"
+========================================
+
+Responsabilidades:
+- Creación de features básicas y derivadas
+- Transformaciones de variables
+- Codificación de variables categóricas
+- Escalado y normalización
+- Logging sistemático de operaciones
 """
 
 import pandas as pd
 import numpy as np
-from typing import List, Dict, Callable, Tuple, Any, Optional
-from scipy import stats
+from typing import Dict, Any, List, Optional, Union
+from datetime import datetime
+from sklearn.preprocessing import StandardScaler, MinMaxScaler, LabelEncoder, OneHotEncoder
+from sklearn.feature_selection import SelectKBest, f_regression, f_classif
+import warnings
 
-# =====================
-# Variables derivadas y ratios
-# =====================
-def compute_ratios(df: pd.DataFrame, numerator_cols: List[str], denominator_cols: List[str]) -> pd.DataFrame:
-    """
-    Genera nuevas columnas como num_i/den_j, con control de división por cero y NaN seguros.
-    Args:
-        df: DataFrame de entrada
-        numerator_cols: Lista de columnas numerador
-        denominator_cols: Lista de columnas denominador
-    Returns:
-        DataFrame con nuevas columnas ratio (no modifica df original)
-    """
-    result = df.copy()
-    for num in numerator_cols:
-        for den in denominator_cols:
-            col_name = f"ratio_{num}_over_{den}"
-            with np.errstate(divide='ignore', invalid='ignore'):
-                ratio = np.where(result[den] != 0, result[num] / result[den], np.nan)
-            result[col_name] = ratio
-    return result
+warnings.filterwarnings("ignore")
 
-def compute_percentage(df: pd.DataFrame, group_col: str, target_col: str) -> pd.DataFrame:
-    """
-    Añade columna % target_col per group_col, calculando proporciones dentro de cada grupo.
-    Args:
-        df: DataFrame de entrada
-        group_col: Columna de agrupación
-        target_col: Columna objetivo (conteo)
-    Returns:
-        DataFrame con columna de porcentaje por grupo
-    """
-    result = df.copy()
-    group_counts = result.groupby(group_col)[target_col].transform('count')
-    result[f'perc_{target_col}_in_{group_col}'] = 100 * result[target_col] / group_counts
-    return result
+# Importar logging
+from .logging import log_action
 
-# =====================
-# Medias ponderadas y agregaciones
-# =====================
-def weighted_mean(df: pd.DataFrame, value_col: str, weight_col: str) -> float:
-    """
-    Calcula la media ponderada, con validación de sum(weights) > 0.
-    Args:
-        df: DataFrame
-        value_col: Columna de valores
-        weight_col: Columna de pesos (no negativos)
-    Returns:
-        Media ponderada (float)
-    """
-    weights = df[weight_col].fillna(0)
-    values = df[value_col].fillna(0)
-    if (weights < 0).any():
-        raise ValueError("Los pesos no pueden ser negativos.")
-    total_weight = weights.sum()
-    if total_weight == 0:
-        return np.nan
-    return np.average(values, weights=weights)
+# Importar sistema de validación y reporte de errores
+from .data_validators import (
+    FeatureSelectionParams, 
+    DataFrameSchema, 
+    validate_dataframe, 
+    validate_feature_selection_params
+)
+from .error_reporter import report_dataframe_error, report_parameter_error
 
-def group_agg(df: pd.DataFrame, group_cols: List[str], aggs: Dict[str, str]) -> pd.DataFrame:
+def create_numeric_features(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
     """
-    Agrega estadísticas personalizadas (mean, sum, std, count), retornando un DataFrame multi-index.
+    Crea features numéricas derivadas de columnas existentes.
+    
     Args:
-        df: DataFrame
-        group_cols: Lista de columnas para agrupar
-        aggs: Diccionario {col: aggfunc}
+        df: DataFrame original
+        columns: Lista de columnas numéricas para crear features
+        
     Returns:
-        DataFrame agrupado
+        DataFrame con features adicionales
     """
-    return df.groupby(group_cols).agg(aggs)
+    start_time = datetime.now()
+    
+    # Validar entrada
+    if not isinstance(columns, list) or len(columns) == 0:
+        raise ValueError("Debe especificar una lista no vacía de columnas")
+    
+    missing_cols = [col for col in columns if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Columnas no encontradas: {missing_cols}")
+    
+    # Crear copia del DataFrame
+    result_df = df.copy()
+    
+    # Crear features para cada columna
+    for col in columns:
+        if col in df.columns and df[col].dtype in ['int64', 'float64']:
+            series = df[col].dropna()
+            if len(series) > 0:
+                # Logaritmo (solo para valores positivos)
+                if (series > 0).all():
+                    result_df[f'{col}_log'] = np.log(series)
+                
+                # Cuadrado
+                result_df[f'{col}_squared'] = series ** 2
+                
+                # Raíz cuadrada (solo para valores no negativos)
+                if (series >= 0).all():
+                    result_df[f'{col}_sqrt'] = np.sqrt(series)
+                
+                # Recíproco (evitando división por cero)
+                if (series != 0).all():
+                    result_df[f'{col}_reciprocal'] = 1 / series
+    
+    execution_time = (datetime.now() - start_time).total_seconds()
+    
+    log_action(
+        function="create_numeric_features",
+        step="features",
+        parameters={"columns": columns},
+        before_metrics={"n_columns": len(df.columns)},
+        after_metrics={"n_columns": len(result_df.columns)},
+        status="success",
+        message=f"Features numéricas creadas para {len(columns)} columnas",
+        execution_time=execution_time
+    )
+    
+    return result_df
 
-# =====================
-# Escalado y normalización
-# =====================
-def min_max_scale(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
+def encode_categorical(df: pd.DataFrame, columns: List[str], 
+                      method: str = 'label') -> pd.DataFrame:
     """
-    Escala cada columna al rango [0,1].
+    Codifica variables categóricas usando diferentes métodos.
+    
     Args:
-        df: DataFrame
-        cols: Columnas a escalar
+        df: DataFrame original
+        columns: Lista de columnas categóricas
+        method: Método de codificación ('label', 'onehot', 'frequency')
+        
     Returns:
-        DataFrame con columnas escaladas
+        DataFrame con variables codificadas
     """
-    result = df.copy()
-    for col in cols:
-        min_val = result[col].min()
-        max_val = result[col].max()
-        if max_val - min_val == 0:
-            result[f'scaled_{col}'] = 0.0
-        else:
-            result[f'scaled_{col}'] = (result[col] - min_val) / (max_val - min_val)
-    return result
+    start_time = datetime.now()
+    
+    # Validar entrada
+    valid_methods = ['label', 'onehot', 'frequency']
+    if method not in valid_methods:
+        raise ValueError(f"Método debe ser uno de: {valid_methods}")
+    
+    if not isinstance(columns, list) or len(columns) == 0:
+        raise ValueError("Debe especificar una lista no vacía de columnas")
+    
+    missing_cols = [col for col in columns if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Columnas no encontradas: {missing_cols}")
+    
+    # Crear copia del DataFrame
+    result_df = df.copy()
+    
+    for col in columns:
+        if col in df.columns:
+            if method == 'label':
+                # Label encoding
+                le = LabelEncoder()
+                result_df[f'{col}_encoded'] = le.fit_transform(df[col].astype(str))
+                
+            elif method == 'onehot':
+                # One-hot encoding
+                dummies = pd.get_dummies(df[col], prefix=col, dummy_na=True)
+                result_df = pd.concat([result_df, dummies], axis=1)
+                
+            elif method == 'frequency':
+                # Frequency encoding
+                freq_map = df[col].value_counts(normalize=True).to_dict()
+                result_df[f'{col}_freq'] = df[col].map(freq_map)
+    
+    execution_time = (datetime.now() - start_time).total_seconds()
+    
+    log_action(
+        function="encode_categorical",
+        step="features",
+        parameters={"columns": columns, "method": method},
+        before_metrics={"n_columns": len(df.columns)},
+        after_metrics={"n_columns": len(result_df.columns)},
+        status="success",
+        message=f"Variables categóricas codificadas usando {method}",
+        execution_time=execution_time
+    )
+    
+    return result_df
 
-def z_score_normalize(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
+def scale_features(df: pd.DataFrame, columns: List[str], 
+                  method: str = 'standard') -> pd.DataFrame:
     """
-    Transforma a puntajes Z: (x - μ)/σ.
+    Escala features numéricas usando diferentes métodos.
+    
     Args:
-        df: DataFrame
-        cols: Columnas a normalizar
+        df: DataFrame original
+        columns: Lista de columnas numéricas a escalar
+        method: Método de escalado ('standard', 'minmax', 'robust')
+        
     Returns:
-        DataFrame con columnas normalizadas
+        DataFrame con features escaladas
     """
-    result = df.copy()
-    for col in cols:
-        mean = result[col].mean()
-        std = result[col].std()
-        if std == 0:
-            result[f'z_{col}'] = 0.0
-        else:
-            result[f'z_{col}'] = (result[col] - mean) / std
-    return result
+    start_time = datetime.now()
+    
+    # Validar entrada
+    valid_methods = ['standard', 'minmax', 'robust']
+    if method not in valid_methods:
+        raise ValueError(f"Método debe ser uno de: {valid_methods}")
+    
+    if not isinstance(columns, list) or len(columns) == 0:
+        raise ValueError("Debe especificar una lista no vacía de columnas")
+    
+    missing_cols = [col for col in columns if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Columnas no encontradas: {missing_cols}")
+    
+    # Filtrar columnas numéricas
+    numeric_cols = [col for col in columns if df[col].dtype in ['int64', 'float64']]
+    
+    if len(numeric_cols) == 0:
+        raise ValueError("No se encontraron columnas numéricas válidas")
+    
+    # Crear copia del DataFrame
+    result_df = df.copy()
+    
+    # Aplicar escalado
+    if method == 'standard':
+        scaler = StandardScaler()
+    elif method == 'minmax':
+        scaler = MinMaxScaler()
+    else:  # robust
+        from sklearn.preprocessing import RobustScaler
+        scaler = RobustScaler()
+    
+    # Escalar las columnas
+    scaled_data = scaler.fit_transform(df[numeric_cols])
+    scaled_df = pd.DataFrame(scaled_data, columns=[f'{col}_{method}_scaled' for col in numeric_cols],
+                            index=df.index)
+    
+    # Concatenar con el DataFrame original
+    result_df = pd.concat([result_df, scaled_df], axis=1)
+    
+    execution_time = (datetime.now() - start_time).total_seconds()
+    
+    log_action(
+        function="scale_features",
+        step="features",
+        parameters={"columns": numeric_cols, "method": method},
+        before_metrics={"n_columns": len(df.columns)},
+        after_metrics={"n_columns": len(result_df.columns)},
+        status="success",
+        message=f"Features escaladas usando {method}",
+        execution_time=execution_time
+    )
+    
+    return result_df
 
-def robust_scale(df: pd.DataFrame, cols: List[str]) -> pd.DataFrame:
+def create_interaction_features(df: pd.DataFrame, columns: List[str], 
+                               max_interactions: int = 10) -> pd.DataFrame:
     """
-    Escala basado en rango intercuartílico para robustez ante outliers.
+    Crea features de interacción entre columnas numéricas.
+    
     Args:
-        df: DataFrame
-        cols: Columnas a escalar
+        df: DataFrame original
+        columns: Lista de columnas numéricas
+        max_interactions: Número máximo de interacciones a crear
+        
     Returns:
-        DataFrame con columnas escaladas robustamente
+        DataFrame con features de interacción
     """
-    result = df.copy()
-    for col in cols:
-        q1 = result[col].quantile(0.25)
-        q3 = result[col].quantile(0.75)
-        iqr = q3 - q1
-        if iqr == 0:
-            result[f'robust_{col}'] = 0.0
-        else:
-            result[f'robust_{col}'] = (result[col] - q1) / iqr
-    return result
+    start_time = datetime.now()
+    
+    # Validar entrada
+    if not isinstance(columns, list) or len(columns) < 2:
+        raise ValueError("Debe especificar al menos 2 columnas")
+    
+    missing_cols = [col for col in columns if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Columnas no encontradas: {missing_cols}")
+    
+    # Filtrar columnas numéricas
+    numeric_cols = [col for col in columns if df[col].dtype in ['int64', 'float64']]
+    
+    if len(numeric_cols) < 2:
+        raise ValueError("Se necesitan al menos 2 columnas numéricas")
+    
+    # Crear copia del DataFrame
+    result_df = df.copy()
+    
+    # Crear interacciones
+    interaction_count = 0
+    for i in range(len(numeric_cols)):
+        for j in range(i + 1, len(numeric_cols)):
+            if interaction_count >= max_interactions:
+                break
+                
+            col1, col2 = numeric_cols[i], numeric_cols[j]
+            
+            # Multiplicación
+            result_df[f'{col1}_x_{col2}'] = df[col1] * df[col2]
+            
+            # División (evitando división por cero)
+            if (df[col2] != 0).all():
+                result_df[f'{col1}_div_{col2}'] = df[col1] / df[col2]
+            
+            # Suma
+            result_df[f'{col1}_plus_{col2}'] = df[col1] + df[col2]
+            
+            # Diferencia
+            result_df[f'{col1}_minus_{col2}'] = df[col1] - df[col2]
+            
+            interaction_count += 1
+        
+        if interaction_count >= max_interactions:
+            break
+    
+    execution_time = (datetime.now() - start_time).total_seconds()
+    
+    log_action(
+        function="create_interaction_features",
+        step="features",
+        parameters={"columns": columns, "max_interactions": max_interactions},
+        before_metrics={"n_columns": len(df.columns)},
+        after_metrics={"n_columns": len(result_df.columns), "interactions_created": interaction_count},
+        status="success",
+        message=f"Features de interacción creadas: {interaction_count}",
+        execution_time=execution_time
+    )
+    
+    return result_df
 
-# =====================
-# Binning y discretización
-# =====================
-def create_bins(df: pd.DataFrame, col: str, bins: List[float], labels: List[str]) -> pd.Series:
+def select_features(
+    df: pd.DataFrame,
+    target_column: str,
+    method: str = 'correlation',
+    n_features: int = 10,
+    feature_columns: Optional[List[str]] = None
+) -> List[str]:
     """
-    Crea categorías discretas a partir de cortes numéricos.
+    Selecciona las mejores features basándose en diferentes métodos estadísticos.
+    
+    Esta función implementa validación robusta de parámetros de entrada:
+    1. Valida que el DataFrame tenga la estructura esperada
+    2. Valida que los parámetros sean del tipo y rango correctos
+    3. Reporta errores detallados que detienen la aplicación
+    4. Registra la ejecución para auditoría
+    
     Args:
-        df: DataFrame
-        col: Columna numérica
-        bins: Lista de cortes
-        labels: Etiquetas para los bins
+        df: DataFrame con los datos
+        target_column: Nombre de la columna objetivo
+        method: Método de selección ('correlation', 'mutual_info', 'f_regression', 'f_classif')
+        n_features: Número de features a seleccionar
+        feature_columns: Lista de columnas a considerar como features (opcional)
+        
     Returns:
-        Serie categórica
+        List[str]: Lista de nombres de las mejores features seleccionadas
+        
+    Raises:
+        ValidationError: Si los parámetros o datos son inválidos
     """
-    if len(bins) - 1 != len(labels):
-        raise ValueError("El número de etiquetas debe ser igual a len(bins)-1")
-    return pd.cut(df[col], bins=bins, labels=labels, include_lowest=True)
-
-def quantile_binning(df: pd.DataFrame, col: str, q: int) -> pd.Series:
-    """
-    Genera q bins iguales en número de observaciones (percentiles).
-    Args:
-        df: DataFrame
-        col: Columna numérica
-        q: Número de bins
-    Returns:
-        Serie categórica
-    """
-    return pd.qcut(df[col], q=q, labels=[f"Q{i+1}" for i in range(q)])
-
-# =====================
-# Intervalos de confianza y errores estándar
-# =====================
-def compute_confidence_interval(df: pd.DataFrame, col: str, alpha: float = 0.05) -> Tuple[float, float]:
-    """
-    Calcula el intervalo de confianza (t-student) para la media de la columna.
-    Args:
-        df: DataFrame
-        col: Columna numérica
-        alpha: Nivel de significancia
-    Returns:
-        (limite_inferior, limite_superior)
-    """
-    data = df[col].dropna()
-    n = len(data)
-    if n < 2:
-        return (np.nan, np.nan)
-    mean = data.mean()
-    se = data.std(ddof=1) / np.sqrt(n)
-    t = stats.t.ppf(1 - alpha/2, df=n-1)
-    return (mean - t*se, mean + t*se)
-
-def standard_error(df: pd.DataFrame, col: str) -> float:
-    """
-    Devuelve el error estándar de la media.
-    Args:
-        df: DataFrame
-        col: Columna numérica
-    Returns:
-        Error estándar (float)
-    """
-    data = df[col].dropna()
-    n = len(data)
-    if n < 2:
-        return np.nan
-    return data.std(ddof=1) / np.sqrt(n)
-
-# =====================
-# Bootstrap y estimaciones robustas
-# =====================
-def bootstrap_statistic(df: pd.DataFrame, col: str, func: Callable, n_boot: int = 1000, alpha: float = 0.05) -> Dict:
-    """
-    Realiza remuestreo bootstrap para estimar distribuciones de medias, medianas u otra estadística func.
-    Devuelve media bootstrap, intervalo percentil [α/2, 1–α/2].
-    Args:
-        df: DataFrame
-        col: Columna numérica
-        func: Función estadística (ej: np.mean, np.median)
-        n_boot: Número de muestras bootstrap
-        alpha: Nivel de significancia
-    Returns:
-        Dict con media, intervalo y distribución bootstrap
-    """
-    data = df[col].dropna().values
-    if len(data) < 2:
-        return {'bootstrap_mean': np.nan, 'ci': (np.nan, np.nan), 'distribution': []}
-    boot_stats = [func(np.random.choice(data, size=len(data), replace=True)) for _ in range(n_boot)]
-    lower = np.percentile(boot_stats, 100*alpha/2)
-    upper = np.percentile(boot_stats, 100*(1-alpha/2))
-    return {
-        'bootstrap_mean': np.mean(boot_stats),
-        'ci': (lower, upper),
-        'distribution': boot_stats
-    }
-
-# =====================
-# Índices y scores compuestos
-# =====================
-def composite_index(df: pd.DataFrame, cols: List[str], method: str = 'mean', weights: Optional[List[float]] = None) -> pd.Series:
-    """
-    Crea un índice compuesto de varias variables con pesos opcionales.
-    Args:
-        df: DataFrame
-        cols: Columnas a combinar
-        method: 'mean' o 'sum'
-        weights: Pesos opcionales (mismo largo que cols)
-    Returns:
-        Serie con índice compuesto
-    """
-    data = df[cols].fillna(0)
-    if weights is not None:
-        weights = np.array(weights)
-        if len(weights) != len(cols):
-            raise ValueError("El número de pesos debe coincidir con el número de columnas")
-        if (weights < 0).any():
-            raise ValueError("Los pesos no pueden ser negativos")
-        if method == 'mean':
-            return (data * weights).sum(axis=1) / weights.sum()
-        elif method == 'sum':
-            return (data * weights).sum(axis=1)
-        else:
-            raise ValueError("Método no soportado")
+    start_time = datetime.now()
+    
+    # Validar parámetros de entrada usando Pydantic
+    try:
+        params = FeatureSelectionParams(
+            target_column=target_column,
+            method=method,
+            n_features=n_features,
+            feature_columns=feature_columns
+        )
+    except Exception as e:
+        report_parameter_error(
+            message=f"Parámetros de selección de features inválidos: {str(e)}",
+            context="select_features",
+            details={
+                "target_column": target_column,
+                "method": method,
+                "n_features": n_features,
+                "feature_columns": feature_columns,
+                "validation_error": str(e)
+            }
+        )
+    
+    # Validar DataFrame
+    schema = DataFrameSchema(
+        required_columns=[target_column],
+        min_rows=3,
+        column_types={target_column: 'object'}  # Permitir tanto numérico como categórico
+    )
+    
+    validation_result = validate_dataframe(df, schema, "select_features")
+    if not validation_result.is_valid:
+        report_dataframe_error(
+            message=f"DataFrame inválido para selección de features: {validation_result.errors[0]}",
+            context="select_features",
+            details={
+                "validation_errors": validation_result.errors,
+                "validation_warnings": validation_result.warnings,
+                "validation_details": validation_result.details
+            }
+        )
+    
+    # Validar parámetros contra el DataFrame
+    param_validation = validate_feature_selection_params(params, df, "select_features")
+    if not param_validation.is_valid:
+        report_parameter_error(
+            message=f"Parámetros incompatibles con el DataFrame: {param_validation.errors[0]}",
+            context="select_features",
+            details={
+                "validation_errors": param_validation.errors,
+                "validation_warnings": param_validation.warnings,
+                "validation_details": param_validation.details
+            }
+        )
+    
+    # Si hay warnings, registrarlos pero continuar
+    if param_validation.warnings:
+        log_action(
+            function="select_features",
+            step="validation",
+            parameters={"target_column": target_column, "method": method, "n_features": n_features},
+            status="warning",
+            message=f"Warnings de validación: {param_validation.warnings}",
+            execution_time=0
+        )
+    
+    # Preparar datos para análisis
+    if feature_columns is None:
+        feature_cols = [col for col in df.columns if col != target_column]
     else:
-        if method == 'mean':
-            return data.mean(axis=1)
-        elif method == 'sum':
-            return data.sum(axis=1)
-        else:
-            raise ValueError("Método no soportado")
+        feature_cols = [col for col in feature_columns if col in df.columns and col != target_column]
+    
+    if len(feature_cols) == 0:
+        report_dataframe_error(
+            message="No hay columnas de features disponibles para análisis",
+            context="select_features",
+            details={
+                "available_columns": list(df.columns),
+                "target_column": target_column,
+                "feature_columns": feature_columns
+            }
+        )
+    
+    # Preparar datos numéricos
+    X = df[feature_cols].select_dtypes(include=[np.number])
+    y = df[target_column]
+    
+    if len(X.columns) == 0:
+        report_dataframe_error(
+            message="No hay columnas numéricas disponibles para análisis de correlación",
+            context="select_features",
+            details={
+                "feature_columns": feature_cols,
+                "numeric_columns": list(X.columns),
+                "target_column": target_column
+            }
+        )
+    
+    # Aplicar selección de features
+    selected_features: List[str] = []
+    
+    if method == 'correlation':
+        try:
+            correlations = X.corrwith(y).abs().sort_values(ascending=False)
+            selected_features = correlations.head(n_features).index.tolist()
+        except Exception as e:
+            report_dataframe_error(
+                message=f"Error al calcular correlaciones: {str(e)}",
+                context="select_features(correlation)",
+                details={
+                    "method": method,
+                    "feature_columns": list(X.columns),
+                    "target_column": target_column,
+                    "error": str(e)
+                }
+            )
+        
+    elif method == 'mutual_info':
+        try:
+            from sklearn.feature_selection import mutual_info_regression, mutual_info_classif
+            
+            if y.dtype in ['int64', 'object']:
+                mi_scores = mutual_info_classif(X, y, random_state=42)
+            else:
+                mi_scores = mutual_info_regression(X, y, random_state=42)
+            
+            feature_scores = list(zip(feature_cols, mi_scores))
+            feature_scores.sort(key=lambda x: x[1], reverse=True)
+            selected_features = [feature for feature, score in feature_scores[:n_features]]
+        except Exception as e:
+            report_dataframe_error(
+                message=f"Error al calcular información mutua: {str(e)}",
+                context="select_features(mutual_info)",
+                details={
+                    "method": method,
+                    "feature_columns": list(X.columns),
+                    "target_column": target_column,
+                    "error": str(e)
+                }
+            )
+        
+    elif method in ['f_regression', 'f_classif']:
+        try:
+            if method == 'f_regression':
+                selector = SelectKBest(score_func=f_regression, k=n_features)
+            else:
+                selector = SelectKBest(score_func=f_classif, k=n_features)
+            
+            selector.fit(X, y)
+            selected_features = [feature_cols[i] for i in selector.get_support(indices=True)]
+        except Exception as e:
+            report_dataframe_error(
+                message=f"Error en selección {method}: {str(e)}",
+                context=f"select_features({method})",
+                details={
+                    "method": method,
+                    "feature_columns": list(X.columns),
+                    "target_column": target_column,
+                    "error": str(e)
+                }
+            )
+    
+    execution_time = (datetime.now() - start_time).total_seconds()
+    
+    # Registrar ejecución exitosa
+    log_action(
+        function="select_features",
+        step="features",
+        parameters={"target_column": target_column, "method": method, "n_features": n_features},
+        before_metrics={"n_features": len(feature_cols)},
+        after_metrics={"n_selected": len(selected_features)},
+        status="success",
+        message=f"Features seleccionadas usando {method}",
+        execution_time=execution_time
+    )
+    
+    return selected_features
 
-def scale_and_score(df: pd.DataFrame, cols: List[str], reference: Dict[str, float]) -> pd.Series:
+def create_time_features(df: pd.DataFrame, date_column: str) -> pd.DataFrame:
     """
-    Compara cada observación contra valores de referencia, produciendo un score de distancia o similitud.
+    Crea features temporales a partir de una columna de fecha.
+    
     Args:
-        df: DataFrame
-        cols: Columnas a comparar
-        reference: Diccionario {col: valor_referencia}
+        df: DataFrame original
+        date_column: Columna con fechas
+        
     Returns:
-        Serie con score de similitud (menor es más similar)
+        DataFrame con features temporales
     """
-    data = df[cols].fillna(0)
-    ref_vec = np.array([reference.get(col, 0) for col in cols])
-    return ((data - ref_vec)**2).sum(axis=1)**0.5 
+    start_time = datetime.now()
+    
+    # Validar entrada
+    if date_column not in df.columns:
+        raise ValueError(f"La columna {date_column} no existe en el DataFrame")
+    
+    # Convertir a datetime si es necesario
+    if not pd.api.types.is_datetime64_any_dtype(df[date_column]):
+        try:
+            df[date_column] = pd.to_datetime(df[date_column])
+        except Exception as e:
+            raise ValueError(f"No se pudo convertir {date_column} a datetime: {e}")
+    
+    # Crear copia del DataFrame
+    result_df = df.copy()
+    
+    # Extraer componentes temporales
+    result_df[f'{date_column}_year'] = df[date_column].dt.year
+    result_df[f'{date_column}_month'] = df[date_column].dt.month
+    result_df[f'{date_column}_day'] = df[date_column].dt.day
+    result_df[f'{date_column}_dayofweek'] = df[date_column].dt.dayofweek
+    result_df[f'{date_column}_quarter'] = df[date_column].dt.quarter
+    result_df[f'{date_column}_is_weekend'] = df[date_column].dt.dayofweek.isin([5, 6]).astype(int)
+    
+    # Crear feature de estación
+    def get_season(month: int) -> int:
+        if month in [12, 1, 2]:
+            return 1  # Invierno
+        elif month in [3, 4, 5]:
+            return 2  # Primavera
+        elif month in [6, 7, 8]:
+            return 3  # Verano
+        else:
+            return 4  # Otoño
+    
+    result_df[f'{date_column}_season'] = df[date_column].dt.month.apply(get_season)
+    
+    # Crear feature de día del año
+    result_df[f'{date_column}_dayofyear'] = df[date_column].dt.dayofyear
+    
+    # Crear feature de semana del año
+    result_df[f'{date_column}_weekofyear'] = df[date_column].dt.isocalendar().week
+    
+    execution_time = (datetime.now() - start_time).total_seconds()
+    
+    log_action(
+        function="create_time_features",
+        step="features",
+        parameters={"date_column": date_column},
+        before_metrics={"n_columns": len(df.columns)},
+        after_metrics={"n_columns": len(result_df.columns)},
+        status="success",
+        message=f"Features temporales creadas para {date_column}",
+        execution_time=execution_time
+    )
+    
+    return result_df
+
+def create_binning_features(df: pd.DataFrame, columns: List[str], 
+                           n_bins: int = 5, method: str = 'equal_width') -> pd.DataFrame:
+    """
+    Crea features de binning para columnas numéricas.
+    
+    Args:
+        df: DataFrame original
+        columns: Lista de columnas numéricas
+        n_bins: Número de bins
+        method: Método de binning ('equal_width', 'equal_frequency', 'quantile')
+        
+    Returns:
+        DataFrame con features de binning
+    """
+    start_time = datetime.now()
+    
+    # Validar entrada
+    valid_methods = ['equal_width', 'equal_frequency', 'quantile']
+    if method not in valid_methods:
+        raise ValueError(f"Método debe ser uno de: {valid_methods}")
+    
+    if not isinstance(columns, list) or len(columns) == 0:
+        raise ValueError("Debe especificar una lista no vacía de columnas")
+    
+    missing_cols = [col for col in columns if col not in df.columns]
+    if missing_cols:
+        raise ValueError(f"Columnas no encontradas: {missing_cols}")
+    
+    # Crear copia del DataFrame
+    result_df = df.copy()
+    
+    for col in columns:
+        if col in df.columns and df[col].dtype in ['int64', 'float64']:
+            series = df[col].dropna()
+            if len(series) == 0:
+                continue
+            
+            if method == 'equal_width':
+                # Binning de ancho igual
+                bins = pd.cut(series, bins=n_bins, labels=False, include_lowest=True)
+                result_df[f'{col}_binned'] = bins
+            
+            elif method == 'equal_frequency':
+                # Binning de frecuencia igual
+                bins = pd.qcut(series, q=n_bins, labels=False, duplicates='drop')
+                result_df[f'{col}_binned'] = bins
+            
+            elif method == 'quantile':
+                # Binning por cuantiles
+                quantiles = series.quantile([i/n_bins for i in range(1, n_bins)])
+                bins = pd.cut(series, bins=quantiles, labels=False, include_lowest=True)
+                result_df[f'{col}_binned'] = bins
+    
+    execution_time = (datetime.now() - start_time).total_seconds()
+    
+    log_action(
+        function="create_binning_features",
+        step="features",
+        parameters={"columns": columns, "n_bins": n_bins, "method": method},
+        before_metrics={"n_columns": len(df.columns)},
+        after_metrics={"n_columns": len(result_df.columns)},
+        status="success",
+        message=f"Features de binning creadas usando {method}",
+        execution_time=execution_time
+    )
+    
+    return result_df

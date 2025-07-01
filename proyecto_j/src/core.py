@@ -1,4 +1,5 @@
-from . import steps, utils
+import steps, utils
+
 
 class Pipeline:
     def __init__(self, config):
@@ -6,9 +7,11 @@ class Pipeline:
 
     def run(self):
         # Cargar datos
-        df = steps.cargar_datos(self.config['input_path'])
+        df = steps.cargar_datos(self.config["input_path"])
         # Limpiar datos
         df = steps.limpiar_datos(df)
+        # Clasificar variables con metadatos enriquecidos
+        variable_metadata = steps.clasificar_variables(df)
         # Transformar datos
         df = steps.transformar_datos(df)
         # Modelar
@@ -16,5 +19,7 @@ class Pipeline:
         # Visualizar
         steps.visualizar(df, results)
         # Reporte
-        steps.generar_reporte(df, results, self.config.get('output_report', 'reporte.pdf'))
-        return df, model, results 
+        steps.generar_reporte(
+            df, results, self.config.get("output_report", "reporte.pdf")
+        )
+        return df, model, results, variable_metadata

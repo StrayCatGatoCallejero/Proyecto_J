@@ -1,0 +1,680 @@
+{
+  "timestamp": "2025-06-29T23:07:27.279487+00:00",
+  "level": "INFO",
+  "message": "JSON Logger initialized",
+  "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+  "module": "system",
+  "function": "system_event",
+  "step": "system",
+  "category": "system",
+  "execution_time": 0.0,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {},
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [],
+  "metadata": {
+    "session_id": "936ad858-b8a1-405d-a223-72c524120223"
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:27.381579+00:00",
+  "level": "INFO",
+  "message": "Data load completed: datos_ejemplo.csv",
+  "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+  "module": "data_loader",
+  "function": "load_csv_file",
+  "step": "data_load",
+  "category": "data_load",
+  "execution_time": 0.10065412521362305,
+  "before_metrics": {
+    "file_size": 51200
+  },
+  "after_metrics": {
+    "rows": 1000,
+    "columns": 10
+  },
+  "parameters": {
+    "file_path": "datos_ejemplo.csv",
+    "file_size": 51200
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "data_load",
+    "file_operation"
+  ],
+  "metadata": {}
+}
+{
+  "timestamp": "2025-06-29T23:07:27.433398+00:00",
+  "level": "WARNING",
+  "message": "Validation schema_validation: 14/15 passed",
+  "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+  "module": "validation",
+  "function": "validate_schema",
+  "step": "validation",
+  "category": "validation",
+  "execution_time": 0.05040431022644043,
+  "before_metrics": {
+    "total_checks": 15
+  },
+  "after_metrics": {
+    "passed_checks": 14,
+    "failed_checks": 1,
+    "success_rate": 0.9333333333333333
+  },
+  "parameters": {
+    "validation_type": "schema_validation"
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "validation",
+    "schema_validation"
+  ],
+  "metadata": {
+    "failed_column": "edad",
+    "error_type": "out_of_range"
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:27.634211+00:00",
+  "level": "INFO",
+  "message": "Analysis pearson_correlation completed",
+  "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+  "module": "analysis",
+  "function": "correlation_analysis",
+  "step": "analysis",
+  "category": "analysis",
+  "execution_time": 0.20037198066711426,
+  "before_metrics": {
+    "input_size": 1000
+  },
+  "after_metrics": {
+    "output_size": 45
+  },
+  "parameters": {
+    "analysis_type": "pearson_correlation"
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "analysis",
+    "pearson_correlation"
+  ],
+  "metadata": {
+    "max_correlation": 0.85,
+    "min_correlation": -0.12,
+    "significant_correlations": 8
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:27.640471+00:00",
+  "level": "ERROR",
+  "message": "Error in process_data: Error de ejemplo para demostración",
+  "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+  "module": "unknown",
+  "function": "process_data",
+  "step": "data_processing",
+  "category": "error_handling",
+  "execution_time": 0.5,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {
+    "step": "data_cleaning",
+    "attempt": 1
+  },
+  "error_details": "Error de ejemplo para demostración",
+  "stack_trace": "Traceback (most recent call last):\n  File \"C:\\Users\\StrayCat\\Documents\\Proyecto_J\\ejemplo_logging_json.py\", line 113, in ejemplo_logging_basico\n    raise ValueError(\"Error de ejemplo para demostración\")\nValueError: Error de ejemplo para demostración\n",
+  "error_type": "ValueError",
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "error",
+    "data_processing"
+  ],
+  "metadata": {}
+}
+{
+  "timestamp": "2025-06-29T23:07:27.691317+00:00",
+  "level": "INFO",
+  "message": "JSON Logger initialized",
+  "session_id": "global",
+  "module": "system",
+  "function": "system_event",
+  "step": "system",
+  "category": "system",
+  "execution_time": 0.0,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {},
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [],
+  "metadata": {
+    "session_id": "global"
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:27.704088+00:00",
+  "level": "INFO",
+  "message": "JSON Logger initialized",
+  "session_id": "session_analisis_1",
+  "module": "system",
+  "function": "system_event",
+  "step": "system",
+  "category": "system",
+  "execution_time": 0.0,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {},
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [],
+  "metadata": {
+    "session_id": "session_analisis_1"
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:27.704289+00:00",
+  "level": "INFO",
+  "message": "New session created: session_analisis_1",
+  "session_id": "global",
+  "module": "system",
+  "function": "system_event",
+  "step": "system",
+  "category": "system",
+  "execution_time": 0.0,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {},
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [],
+  "metadata": {
+    "total_sessions": 1
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:27.719407+00:00",
+  "level": "INFO",
+  "message": "JSON Logger initialized",
+  "session_id": "session_analisis_2",
+  "module": "system",
+  "function": "system_event",
+  "step": "system",
+  "category": "system",
+  "execution_time": 0.0,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {},
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [],
+  "metadata": {
+    "session_id": "session_analisis_2"
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:27.719875+00:00",
+  "level": "INFO",
+  "message": "New session created: session_analisis_2",
+  "session_id": "global",
+  "module": "system",
+  "function": "system_event",
+  "step": "system",
+  "category": "system",
+  "execution_time": 0.0,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {},
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [],
+  "metadata": {
+    "total_sessions": 2
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:27.821982+00:00",
+  "level": "INFO",
+  "message": "Data load completed: encuesta_demografica.csv",
+  "session_id": "session_analisis_1",
+  "module": "data_loader",
+  "function": "load_demographic_data",
+  "step": "data_load",
+  "category": "data_load",
+  "execution_time": 0.10054731369018555,
+  "before_metrics": {
+    "file_size": 204800
+  },
+  "after_metrics": {
+    "rows": 5000,
+    "columns": 15
+  },
+  "parameters": {
+    "file_path": "encuesta_demografica.csv",
+    "file_size": 204800
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "data_load",
+    "file_operation"
+  ],
+  "metadata": {}
+}
+{
+  "timestamp": "2025-06-29T23:07:27.972613+00:00",
+  "level": "ERROR",
+  "message": "Business rules validation: 8 executed, 2 failed",
+  "session_id": "session_analisis_1",
+  "module": "business_rules",
+  "function": "validate_demographics",
+  "step": "business_rules",
+  "category": "business_rules",
+  "execution_time": 0.1501636505126953,
+  "before_metrics": {
+    "rules_executed": 8
+  },
+  "after_metrics": {
+    "rules_failed": 2,
+    "rules_warnings": 1,
+    "success_rate": 0.75
+  },
+  "parameters": {
+    "rules_executed": 8
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "business_rules",
+    "validation"
+  ],
+  "metadata": {
+    "failed_rules": [
+      "age_range",
+      "income_validation"
+    ],
+    "warnings": [
+      "gender_distribution"
+    ]
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:28.273290+00:00",
+  "level": "INFO",
+  "message": "Analysis descriptive_analysis completed",
+  "session_id": "session_analisis_1",
+  "module": "analysis",
+  "function": "descriptive_statistics",
+  "step": "analysis",
+  "category": "analysis",
+  "execution_time": 0.30028557777404785,
+  "before_metrics": {
+    "input_size": 5000
+  },
+  "after_metrics": {
+    "output_size": 120
+  },
+  "parameters": {
+    "analysis_type": "descriptive_analysis"
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "analysis",
+    "descriptive_analysis"
+  ],
+  "metadata": {
+    "mean_age": 42.5,
+    "gender_distribution": {
+      "Masculino": 0.48,
+      "Femenino": 0.52
+    },
+    "education_levels": {
+      "Primaria": 0.15,
+      "Secundaria": 0.35,
+      "Universitaria": 0.5
+    }
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:28.474428+00:00",
+  "level": "INFO",
+  "message": "Analysis pearson_correlation completed",
+  "session_id": "session_analisis_2",
+  "module": "analysis",
+  "function": "correlation_analysis",
+  "step": "analysis",
+  "category": "analysis",
+  "execution_time": 0.2005014419555664,
+  "before_metrics": {
+    "input_size": 5000
+  },
+  "after_metrics": {
+    "output_size": 105
+  },
+  "parameters": {
+    "analysis_type": "pearson_correlation"
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "analysis",
+    "pearson_correlation"
+  ],
+  "metadata": {
+    "strong_correlations": 5,
+    "moderate_correlations": 12,
+    "weak_correlations": 88
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:28.515051+00:00",
+  "level": "INFO",
+  "message": "JSON Logger initialized",
+  "session_id": "5b64280c-41f5-4de6-8802-644726b50e3e",
+  "module": "system",
+  "function": "system_event",
+  "step": "system",
+  "category": "system",
+  "execution_time": 0.0,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {},
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [],
+  "metadata": {
+    "session_id": "5b64280c-41f5-4de6-8802-644726b50e3e"
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:28.620988+00:00",
+  "level": "INFO",
+  "message": "Business rules validation: 4 executed, 0 failed",
+  "session_id": "5b64280c-41f5-4de6-8802-644726b50e3e",
+  "module": "business_rules",
+  "function": "validate_business_rules",
+  "step": "business_rules",
+  "category": "business_rules",
+  "execution_time": 0.09549856185913086,
+  "before_metrics": {
+    "rules_executed": 4
+  },
+  "after_metrics": {
+    "rules_failed": 0,
+    "rules_warnings": 0,
+    "success_rate": 1.0
+  },
+  "parameters": {
+    "rules_executed": 4
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "business_rules",
+    "validation"
+  ],
+  "metadata": {
+    "validation_results": [
+      "demographics",
+      "likert",
+      "likert",
+      "cross_consistency"
+    ],
+    "failed_rules": [],
+    "warning_rules": []
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:28.657269+00:00",
+  "level": "INFO",
+  "message": "JSON Logger initialized",
+  "session_id": "36a393c3-0b2d-483d-b063-393c0e69afa4",
+  "module": "system",
+  "function": "system_event",
+  "step": "system",
+  "category": "system",
+  "execution_time": 0.0,
+  "before_metrics": {},
+  "after_metrics": {},
+  "parameters": {},
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": null,
+  "request_id": null,
+  "correlation_id": null,
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [],
+  "metadata": {
+    "session_id": "36a393c3-0b2d-483d-b063-393c0e69afa4"
+  }
+}
+{
+  "timestamp": "2025-06-29T23:07:28.659783+00:00",
+  "level": "INFO",
+  "message": "Ejemplo de log estructurado",
+  "session_id": "36a393c3-0b2d-483d-b063-393c0e69afa4",
+  "module": "ejemplo",
+  "function": "ejemplo_formato_json",
+  "step": "demonstration",
+  "category": "system",
+  "execution_time": 1.5,
+  "before_metrics": {
+    "rows": 100,
+    "columns": 10
+  },
+  "after_metrics": {
+    "processed_rows": 95,
+    "errors": 5
+  },
+  "parameters": {
+    "param1": "valor1",
+    "param2": 42
+  },
+  "error_details": null,
+  "stack_trace": null,
+  "error_type": null,
+  "user_id": "usuario_ejemplo",
+  "request_id": "req_12345",
+  "correlation_id": "corr_67890",
+  "system_info": {
+    "platform": "Windows-11-10.0.26100-SP0",
+    "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+    "cpu_count": 8,
+    "memory_total": 8419024896,
+    "process_id": 20364
+  },
+  "tags": [
+    "ejemplo",
+    "demo"
+  ],
+  "metadata": {
+    "version": "1.0",
+    "environment": "development"
+  }
+}

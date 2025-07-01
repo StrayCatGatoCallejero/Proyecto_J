@@ -1,0 +1,1 @@
+# Este archivo hace que el directorio proyecto_j sea reconocido como un paquete de Python 

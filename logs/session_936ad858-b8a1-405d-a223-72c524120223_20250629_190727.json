@@ -1,0 +1,193 @@
+[
+  {
+    "timestamp": "2025-06-29T23:07:27.279487+00:00",
+    "level": "INFO",
+    "message": "JSON Logger initialized",
+    "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+    "module": "system",
+    "function": "system_event",
+    "step": "system",
+    "category": "system",
+    "execution_time": 0.0,
+    "before_metrics": {},
+    "after_metrics": {},
+    "parameters": {},
+    "error_details": null,
+    "stack_trace": null,
+    "error_type": null,
+    "user_id": null,
+    "request_id": null,
+    "correlation_id": null,
+    "system_info": {
+      "platform": "Windows-11-10.0.26100-SP0",
+      "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+      "cpu_count": 8,
+      "memory_total": 8419024896,
+      "process_id": 20364
+    },
+    "tags": [],
+    "metadata": {
+      "session_id": "936ad858-b8a1-405d-a223-72c524120223"
+    }
+  },
+  {
+    "timestamp": "2025-06-29T23:07:27.381579+00:00",
+    "level": "INFO",
+    "message": "Data load completed: datos_ejemplo.csv",
+    "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+    "module": "data_loader",
+    "function": "load_csv_file",
+    "step": "data_load",
+    "category": "data_load",
+    "execution_time": 0.10065412521362305,
+    "before_metrics": {
+      "file_size": 51200
+    },
+    "after_metrics": {
+      "rows": 1000,
+      "columns": 10
+    },
+    "parameters": {
+      "file_path": "datos_ejemplo.csv",
+      "file_size": 51200
+    },
+    "error_details": null,
+    "stack_trace": null,
+    "error_type": null,
+    "user_id": null,
+    "request_id": null,
+    "correlation_id": null,
+    "system_info": {
+      "platform": "Windows-11-10.0.26100-SP0",
+      "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+      "cpu_count": 8,
+      "memory_total": 8419024896,
+      "process_id": 20364
+    },
+    "tags": [
+      "data_load",
+      "file_operation"
+    ],
+    "metadata": {}
+  },
+  {
+    "timestamp": "2025-06-29T23:07:27.433398+00:00",
+    "level": "WARNING",
+    "message": "Validation schema_validation: 14/15 passed",
+    "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+    "module": "validation",
+    "function": "validate_schema",
+    "step": "validation",
+    "category": "validation",
+    "execution_time": 0.05040431022644043,
+    "before_metrics": {
+      "total_checks": 15
+    },
+    "after_metrics": {
+      "passed_checks": 14,
+      "failed_checks": 1,
+      "success_rate": 0.9333333333333333
+    },
+    "parameters": {
+      "validation_type": "schema_validation"
+    },
+    "error_details": null,
+    "stack_trace": null,
+    "error_type": null,
+    "user_id": null,
+    "request_id": null,
+    "correlation_id": null,
+    "system_info": {
+      "platform": "Windows-11-10.0.26100-SP0",
+      "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+      "cpu_count": 8,
+      "memory_total": 8419024896,
+      "process_id": 20364
+    },
+    "tags": [
+      "validation",
+      "schema_validation"
+    ],
+    "metadata": {
+      "failed_column": "edad",
+      "error_type": "out_of_range"
+    }
+  },
+  {
+    "timestamp": "2025-06-29T23:07:27.634211+00:00",
+    "level": "INFO",
+    "message": "Analysis pearson_correlation completed",
+    "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+    "module": "analysis",
+    "function": "correlation_analysis",
+    "step": "analysis",
+    "category": "analysis",
+    "execution_time": 0.20037198066711426,
+    "before_metrics": {
+      "input_size": 1000
+    },
+    "after_metrics": {
+      "output_size": 45
+    },
+    "parameters": {
+      "analysis_type": "pearson_correlation"
+    },
+    "error_details": null,
+    "stack_trace": null,
+    "error_type": null,
+    "user_id": null,
+    "request_id": null,
+    "correlation_id": null,
+    "system_info": {
+      "platform": "Windows-11-10.0.26100-SP0",
+      "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+      "cpu_count": 8,
+      "memory_total": 8419024896,
+      "process_id": 20364
+    },
+    "tags": [
+      "analysis",
+      "pearson_correlation"
+    ],
+    "metadata": {
+      "max_correlation": 0.85,
+      "min_correlation": -0.12,
+      "significant_correlations": 8
+    }
+  },
+  {
+    "timestamp": "2025-06-29T23:07:27.640471+00:00",
+    "level": "ERROR",
+    "message": "Error in process_data: Error de ejemplo para demostración",
+    "session_id": "936ad858-b8a1-405d-a223-72c524120223",
+    "module": "unknown",
+    "function": "process_data",
+    "step": "data_processing",
+    "category": "error_handling",
+    "execution_time": 0.5,
+    "before_metrics": {},
+    "after_metrics": {},
+    "parameters": {
+      "step": "data_cleaning",
+      "attempt": 1
+    },
+    "error_details": "Error de ejemplo para demostración",
+    "stack_trace": "Traceback (most recent call last):\n  File \"C:\\Users\\StrayCat\\Documents\\Proyecto_J\\ejemplo_logging_json.py\", line 113, in ejemplo_logging_basico\n    raise ValueError(\"Error de ejemplo para demostración\")\nValueError: Error de ejemplo para demostración\n",
+    "error_type": "ValueError",
+    "user_id": null,
+    "request_id": null,
+    "correlation_id": null,
+    "system_info": {
+      "platform": "Windows-11-10.0.26100-SP0",
+      "python_version": "3.13.1 (tags/v3.13.1:0671451, Dec  3 2024, 19:06:28) [MSC v.1942 64 bit (AMD64)]",
+      "cpu_count": 8,
+      "memory_total": 8419024896,
+      "process_id": 20364
+    },
+    "tags": [
+      "error",
+      "data_processing"
+    ],
+    "metadata": {}
+  }
+]

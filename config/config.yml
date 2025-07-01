@@ -104,6 +104,56 @@ logging:
   file: "logs/pipeline.log"
   max_file_size: "10MB"
   backup_count: 5
+  
+  # Configuración de logging JSON mejorado
+  json_logging:
+    enabled: true                # Activa/desactiva globalmente
+    file: "logs/pipeline.json"   # Ruta al fichero de logs
+    level: "INFO"                # Niveles: DEBUG, INFO, WARNING, ERROR
+    console_output: false        # Mostrar logs JSON en consola
+    compression: false           # Comprimir logs antiguos
+    
+    # Rotación de archivos
+    rotation:
+      enabled: true
+      when: "midnight"           # midnight, hourly, daily, weekly
+      interval: 1
+      backup_count: 7
+      max_bytes: "50MB"
+    
+    # Configuración para sistemas de monitoreo
+    monitoring:
+      elk:
+        enabled: false
+        host: "localhost"
+        port: 9200
+        index_prefix: "pipeline-logs"
+      
+      datadog:
+        enabled: false
+        api_key: ""
+        host: "localhost"
+        port: 8126
+        
+      prometheus:
+        enabled: false
+        port: 9090
+        metrics_path: "/metrics"
+    
+    # Configuración de sesiones
+    sessions:
+      auto_create: true
+      session_timeout: 3600      # segundos
+      max_sessions: 100
+      cleanup_interval: 300      # segundos
+    
+    # Configuración de métricas
+    metrics:
+      enabled: true
+      collection_interval: 60    # segundos
+      include_performance: true
+      include_memory: true
+      include_cpu: true
 
 # Configuración de exportación
 export:
@@ -232,4 +282,15 @@ performance:
   # Paralelización
   parallel:
     enabled: true
-    max_workers: 4 
+    max_workers: 4
+
+# Configuración de notificaciones
+notifications:
+  # Habilitar/deshabilitar notificaciones externas
+  enabled: false
+  
+  # Webhook de Slack (opcional)
+  slack_webhook: ""
+  
+  # Lista de emails para notificaciones (opcional)
+  email_recipients: [] 

@@ -17,6 +17,7 @@ from typing import Union, List, Dict, Any
 # 1. Carga de Datos
 # ============================================================================
 
+
 @st.cache_data
 def cargar_datos(path: str) -> pd.DataFrame:
     """
@@ -26,7 +27,7 @@ def cargar_datos(path: str) -> pd.DataFrame:
         raise FileNotFoundError(f"El archivo no se encuentra en la ruta: {path}")
 
     filename = os.path.basename(path).lower()
-    
+
     try:
         if filename.endswith(".sav"):
             df, _ = pyreadstat.read_sav(path)
@@ -37,14 +38,18 @@ def cargar_datos(path: str) -> pd.DataFrame:
         elif filename.endswith((".xlsx", ".xls")):
             df = pd.read_excel(path)
         else:
-            raise ValueError("Formato de archivo no soportado. Use .sav, .dta, .csv, .xls, o .xlsx.")
+            raise ValueError(
+                "Formato de archivo no soportado. Use .sav, .dta, .csv, .xls, o .xlsx."
+            )
         return df
     except Exception as e:
         raise IOError(f"Error al leer el archivo {path}: {e}")
 
+
 # ============================================================================
 # 2. Limpieza de Datos
 # ============================================================================
+
 
 def visualizar_valores_faltantes(df: pd.DataFrame):
     """
@@ -54,11 +59,14 @@ def visualizar_valores_faltantes(df: pd.DataFrame):
     fig = msno.matrix(df).get_figure()
     return fig
 
+
 @st.cache_data
-def limpiar_datos(df: pd.DataFrame, estrategia_imputacion: str = 'knn', llm_imputer=None) -> pd.DataFrame:
+def limpiar_datos(
+    df: pd.DataFrame, estrategia_imputacion: str = "knn", llm_imputer=None
+) -> pd.DataFrame:
     """
     Limpia el DataFrame, manejando valores faltantes.
-    
+
     Estrategias de imputación:
     - 'media': Imputa con la media (solo para numéricos).
     - 'mediana': Imputa con la mediana (solo para numéricos).
@@ -68,7 +76,7 @@ def limpiar_datos(df: pd.DataFrame, estrategia_imputacion: str = 'knn', llm_impu
     """
     df_limpio = df.copy()
 
-    if estrategia_imputacion == 'llm':
+    if estrategia_imputacion == "llm":
         if llm_imputer:
             # Lógica para usar el imputador LLM.
             # Esto es un placeholder. La implementación real sería más compleja.
@@ -82,36 +90,44 @@ def limpiar_datos(df: pd.DataFrame, estrategia_imputacion: str = 'knn', llm_impu
     from sklearn.impute import SimpleImputer, KNNImputer
 
     num_cols = df_limpio.select_dtypes(include=np.number).columns
-    cat_cols = df_limpio.select_dtypes(include=['object', 'category']).columns
+    cat_cols = df_limpio.select_dtypes(include=["object", "category"]).columns
 
-    if estrategia_imputacion in ['media', 'mediana']:
+    if estrategia_imputacion in ["media", "mediana"]:
         imputer = SimpleImputer(strategy=estrategia_imputacion)
         df_limpio[num_cols] = imputer.fit_transform(df_limpio[num_cols])
-    elif estrategia_imputacion == 'moda':
-        imputer = SimpleImputer(strategy='most_frequent')
+    elif estrategia_imputacion == "moda":
+        imputer = SimpleImputer(strategy="most_frequent")
         df_limpio[cat_cols] = imputer.fit_transform(df_limpio[cat_cols])
-    elif estrategia_imputacion == 'knn':
+    elif estrategia_imputacion == "knn":
         # KNNImputer solo funciona con datos numéricos.
         # Primero, convertimos categóricos a numéricos para el imputer.
         df_encoded = df_limpio.copy()
         for col in cat_cols:
-            df_encoded[col] = df_encoded[col].astype('category').cat.codes.replace(-1, np.nan)
-        
+            df_encoded[col] = (
+                df_encoded[col].astype("category").cat.codes.replace(-1, np.nan)
+            )
+
         imputer = KNNImputer()
-        df_imputed_encoded = pd.DataFrame(imputer.fit_transform(df_encoded), columns=df_encoded.columns)
+        df_imputed_encoded = pd.DataFrame(
+            imputer.fit_transform(df_encoded), columns=df_encoded.columns
+        )
 
         # Revertir la codificación de las columnas categóricas
         for col in cat_cols:
-            original_cats = df_limpio[col].astype('category').cat.categories
-            df_imputed_encoded[col] = pd.Categorical.from_codes(df_imputed_encoded[col].round().astype(int), categories=original_cats)
-        
+            original_cats = df_limpio[col].astype("category").cat.categories
+            df_imputed_encoded[col] = pd.Categorical.from_codes(
+                df_imputed_encoded[col].round().astype(int), categories=original_cats
+            )
+
         df_limpio = df_imputed_encoded
 
     return df_limpio
 
+
 # ============================================================================
 # 3. Transformación de Datos
 # ============================================================================
+
 
 @st.cache_data
 def transformar_datos(df: pd.DataFrame, normalizar: bool = False) -> pd.DataFrame:
@@ -119,20 +135,25 @@ def transformar_datos(df: pd.DataFrame, normalizar: bool = False) -> pd.DataFram
     Transforma datos categóricos a numéricos y opcionalmente normaliza.
     """
     df_transformado = df.copy()
-    
+
     # One-hot encode para categóricos
     df_transformado = pd.get_dummies(df_transformado, dummy_na=True)
 
     if normalizar:
         from sklearn.preprocessing import MinMaxScaler
+
         scaler = MinMaxScaler()
-        df_transformado[df_transformado.columns] = scaler.fit_transform(df_transformado[df_transformado.columns])
-        
+        df_transformado[df_transformado.columns] = scaler.fit_transform(
+            df_transformado[df_transformado.columns]
+        )
+
     return df_transformado
+
 
 # ============================================================================
 # 4. Modelo de Proyección
 # ============================================================================
+
 
 @st.cache_data
 def ajustar_modelo(df: pd.DataFrame, features: List[str], target: str) -> Any:
@@ -153,41 +174,63 @@ def ajustar_modelo(df: pd.DataFrame, features: List[str], target: str) -> Any:
     model.fit(X_train, y_train)
     return model
 
+
 def predecir(model: Any, X_nuevos: pd.DataFrame) -> np.ndarray:
     """
     Realiza predicciones usando el modelo entrenado.
     """
     return model.predict(X_nuevos)
 
+
 # ============================================================================
 # 5. Visualización
 # ============================================================================
 
-def visualizar_regresion(df: pd.DataFrame, model: Any, features: List[str], target: str) -> go.Figure:
+
+def visualizar_regresion(
+    df: pd.DataFrame, model: Any, features: List[str], target: str
+) -> go.Figure:
     """
     Crea un gráfico interactivo con Plotly mostrando los datos y la línea de regresión.
     Funciona mejor para 1 o 2 features.
     """
     if len(features) == 1:
         # Regresión simple
-        fig = px.scatter(df, x=features[0], y=target, title=f'Regresión Lineal: {target} vs {features[0]}',
-                         trendline="ols", trendline_color_override="red")
+        fig = px.scatter(
+            df,
+            x=features[0],
+            y=target,
+            title=f"Regresión Lineal: {target} vs {features[0]}",
+            trendline="ols",
+            trendline_color_override="red",
+        )
     elif len(features) == 2:
         # Regresión múltiple (visualización 3D)
-        
+
         # Crear una malla para el plano de regresión
         x_range = np.linspace(df[features[0]].min(), df[features[0]].max(), 10)
         y_range = np.linspace(df[features[1]].min(), df[features[1]].max(), 10)
         x_mesh, y_mesh = np.meshgrid(x_range, y_range)
-        z_mesh = model.predict(pd.DataFrame({features[0]: x_mesh.ravel(), features[1]: y_mesh.ravel()}))
+        z_mesh = model.predict(
+            pd.DataFrame({features[0]: x_mesh.ravel(), features[1]: y_mesh.ravel()})
+        )
         z_mesh = z_mesh.reshape(x_mesh.shape)
 
         # Gráfico de dispersión 3D de los datos
-        fig = px.scatter_3d(df, x=features[0], y=features[1], z=target, 
-                            title=f'Regresión Múltiple: {target} vs {features[0]} & {features[1]}')
-        
+        fig = px.scatter_3d(
+            df,
+            x=features[0],
+            y=features[1],
+            z=target,
+            title=f"Regresión Múltiple: {target} vs {features[0]} & {features[1]}",
+        )
+
         # Añadir el plano de regresión
-        fig.add_trace(go.Surface(x=x_range, y=y_range, z=z_mesh, name='Plano de Regresión', opacity=0.7))
+        fig.add_trace(
+            go.Surface(
+                x=x_range, y=y_range, z=z_mesh, name="Plano de Regresión", opacity=0.7
+            )
+        )
     else:
         # No se puede visualizar fácilmente con más de 2 features
         print("La visualización solo está implementada para 1 o 2 features.")
@@ -195,21 +238,24 @@ def visualizar_regresion(df: pd.DataFrame, model: Any, features: List[str], targ
 
     return fig
 
+
 def visualizar_proyeccion(x_data, y_data, x_proyeccion, y_proyeccion) -> go.Figure:
     """
     Crea un gráfico interactivo con Plotly Express mostrando datos y proyecciones.
     """
-    df_real = pd.DataFrame({'x': x_data, 'y': y_data, 'tipo': 'Datos Reales'})
-    df_proy = pd.DataFrame({'x': x_proyeccion, 'y': y_proyeccion, 'tipo': 'Proyección'})
-    
+    df_real = pd.DataFrame({"x": x_data, "y": y_data, "tipo": "Datos Reales"})
+    df_proy = pd.DataFrame({"x": x_proyeccion, "y": y_proyeccion, "tipo": "Proyección"})
+
     df_plot = pd.concat([df_real, df_proy])
-    
-    fig = px.line(df_plot, x='x', y='y', color='tipo', title="Proyección Demográfica")
+
+    fig = px.line(df_plot, x="x", y="y", color="tipo", title="Proyección Demográfica")
     return fig
+
 
 # ============================================================================
 # 6. Generación de Reportes
 # ============================================================================
+
 
 def generar_reporte_pdf(df: pd.DataFrame, output_path: str = "reporte.pdf"):
     """
@@ -218,18 +264,22 @@ def generar_reporte_pdf(df: pd.DataFrame, output_path: str = "reporte.pdf"):
     """
     temp_csv_path = "temp_report_data.csv"
     df.to_csv(temp_csv_path, index=False)
-    
-    report_generator_path = os.path.join("tools", "csv-to-pdf-report-generator", "app.py")
-    
+
+    report_generator_path = os.path.join(
+        "tools", "csv-to-pdf-report-generator", "app.py"
+    )
+
     if not os.path.exists(report_generator_path):
-        raise FileNotFoundError(f"El script generador de reportes no se encuentra en: {report_generator_path}")
-        
+        raise FileNotFoundError(
+            f"El script generador de reportes no se encuentra en: {report_generator_path}"
+        )
+
     try:
         subprocess.run(
             [sys.executable, report_generator_path, temp_csv_path, output_path],
             check=True,
             capture_output=True,
-            text=True
+            text=True,
         )
         print(f"Reporte PDF generado exitosamente en {output_path}")
     except subprocess.CalledProcessError as e:
@@ -239,9 +289,11 @@ def generar_reporte_pdf(df: pd.DataFrame, output_path: str = "reporte.pdf"):
         if os.path.exists(temp_csv_path):
             os.remove(temp_csv_path)
 
+
 # ============================================================================
 # Pipeline Principal (Ejemplo de uso)
 # ============================================================================
+
 
 def pipeline_completo(ruta_archivo: str, features: List[str], target: str):
     """
@@ -250,25 +302,27 @@ def pipeline_completo(ruta_archivo: str, features: List[str], target: str):
     # 1. Cargar datos
     df = cargar_datos(ruta_archivo)
     print("Datos cargados exitosamente.")
-    
+
     # 2. Limpiar datos (usando KNN como ejemplo)
     # Asegurémonos que las columnas para el modelo existen antes de limpiar
     cols_modelo = features + [target]
     if not all(col in df.columns for col in cols_modelo):
-        raise ValueError(f"El DataFrame no contiene todas las columnas necesarias para el modelo: {cols_modelo}")
-    
-    df_limpio = limpiar_datos(df, estrategia_imputacion='knn')
+        raise ValueError(
+            f"El DataFrame no contiene todas las columnas necesarias para el modelo: {cols_modelo}"
+        )
+
+    df_limpio = limpiar_datos(df, estrategia_imputacion="knn")
     print("Datos limpiados.")
-    
+
     # 3. Transformar datos (puede no ser necesario para regresión lineal si no hay categóricos)
     # Por ahora, nos aseguramos de que los datos del modelo son numéricos.
     df_modelo = df_limpio[cols_modelo].copy()
-    
+
     # 4. Ajustar y visualizar el modelo de regresión
     print(f"Ajustando modelo para predecir '{target}' a partir de {features}...")
     modelo = ajustar_modelo(df_modelo, features, target)
     print("Modelo ajustado.")
-    
+
     # Imprimir coeficientes para insight
     print(f"Coeficientes del modelo: {modelo.coef_}")
     print(f"Intercepto del modelo: {modelo.intercept_:.4f}")
@@ -279,19 +333,21 @@ def pipeline_completo(ruta_archivo: str, features: List[str], target: str):
         # fig_regresion.show() # .show() abre una ventana, que puede no ser ideal en scripts
         # Guardamos la figura como un archivo HTML para facilitar la inspección.
         fig_regresion.write_html("visualizacion_regresion.html")
-        print("Visualización de la regresión guardada en 'visualizacion_regresion.html'")
-
+        print(
+            "Visualización de la regresión guardada en 'visualizacion_regresion.html'"
+        )
 
     # 6. Generar reporte con los datos limpios
     generar_reporte_pdf(df_limpio, "reporte_demografico.pdf")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     # Este bloque es para pruebas.
-    ruta_datos_ejemplo = os.path.join('data', 'datos_ejemplo.sav')
-    
+    ruta_datos_ejemplo = os.path.join("data", "datos_ejemplo.sav")
+
     # Definimos las variables para nuestro modelo de regresión
-    features_a_usar = ['edad', 'anios_educacion']
-    target_a_predecir = 'ingresos_anuales'
+    features_a_usar = ["edad", "anios_educacion"]
+    target_a_predecir = "ingresos_anuales"
 
     try:
         print("--- Iniciando pipeline completo ---")
@@ -301,4 +357,4 @@ if __name__ == '__main__':
     except FileNotFoundError:
         print(f"Archivo de ejemplo no encontrado en la ruta: {ruta_datos_ejemplo}")
     except Exception as e:
-        print(f"Ocurrió un error en el pipeline: {e}") 
+        print(f"Ocurrió un error en el pipeline: {e}")

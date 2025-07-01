@@ -1,48 +1,100 @@
 #!/usr/bin/env python3
 """
-Script de prueba para verificar imports
+Script para probar las importaciones de la aplicación Streamlit.
 """
-import os
+
 import sys
+import os
+from pathlib import Path
 
-# Add project root to path
-project_root = os.path.abspath(os.path.dirname(__file__))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
+def test_imports():
+    """Prueba todas las importaciones necesarias."""
+    
+    # Agregar el directorio raíz al path
+    project_root = Path(__file__).parent.absolute()
+    sys.path.insert(0, str(project_root))
+    
+    print("🔍 Probando importaciones...")
+    
+    try:
+        # Probar importación de pandas
+        import pandas as pd
+        print("✅ pandas importado correctamente")
+        
+        # Probar importación de streamlit
+        import streamlit as st
+        print("✅ streamlit importado correctamente")
+        
+        # Probar importación de numpy
+        import numpy as np
+        print("✅ numpy importado correctamente")
+        
+        # Probar importación de matplotlib
+        import matplotlib.pyplot as plt
+        print("✅ matplotlib importado correctamente")
+        
+        # Probar importación de seaborn
+        import seaborn as sns
+        print("✅ seaborn importado correctamente")
+        
+        # Probar importación de scipy
+        from scipy import stats
+        print("✅ scipy importado correctamente")
+        
+        # Probar importación de sklearn
+        from sklearn.preprocessing import StandardScaler
+        print("✅ sklearn importado correctamente")
+        
+        # Probar importación de plotly
+        import plotly.graph_objects as go
+        print("✅ plotly importado correctamente")
+        
+        # Probar importación de pyreadstat
+        import pyreadstat
+        print("✅ pyreadstat importado correctamente")
+        
+        # Probar importaciones del proyecto
+        from proyecto_j.src.estadistica import (
+            cargar_archivo,
+            calcular_media,
+            calcular_moda,
+            calcular_percentiles,
+            generar_histograma,
+            calcular_correlacion_pearson,
+            calcular_correlacion_spearman,
+            generar_heatmap_correlacion,
+            obtener_columnas_numericas,
+            obtener_columnas_categoricas,
+        )
+        print("✅ Funciones de estadistica importadas correctamente")
+        
+        from proyecto_j.src.ciencias_sociales import (
+            clasificar_variable,
+            analisis_descriptivo_cs,
+            analisis_bivariado_cs,
+            analisis_regresion_multiple_cs,
+            analisis_clusters_cs,
+            calcular_indice_gini,
+            calcular_indice_gini_simple,
+            calcular_indice_calidad_vida,
+            calcular_indice_calidad_vida_simple,
+            validar_supuestos_regresion,
+            analizar_valores_perdidos,
+            sugerir_imputacion,
+        )
+        print("✅ Funciones de ciencias_sociales importadas correctamente")
+        
+        print("\n🎉 ¡Todas las importaciones funcionan correctamente!")
+        return True
+        
+    except ImportError as e:
+        print(f"❌ Error de importación: {e}")
+        return False
+    except Exception as e:
+        print(f"❌ Error inesperado: {e}")
+        return False
 
-print(f"Project root: {project_root}")
-print(f"Python path: {sys.path[:3]}")
-
-try:
-    print("Testing imports...")
-    from processing.io import DataLoader
-    print("✅ processing.io imported successfully")
-    
-    from processing.types import SchemaValidator
-    print("✅ processing.types imported successfully")
-    
-    from processing.filters import DataFilter
-    print("✅ processing.filters imported successfully")
-    
-    from processing.stats import summary_statistics_advanced
-    print("✅ processing.stats imported successfully")
-    
-    from processing.features import compute_ratios
-    print("✅ processing.features imported successfully")
-    
-    from processing.visualization import VisualizationGenerator
-    print("✅ processing.visualization imported successfully")
-    
-    from processing.logging import setup_logging
-    print("✅ processing.logging imported successfully")
-    
-    from orchestrator.pipeline_orchestrator import PipelineOrchestrator
-    print("✅ orchestrator.pipeline_orchestrator imported successfully")
-    
-    print("\n🎉 All imports successful! Streamlit should work now.")
-    
-except ImportError as e:
-    print(f"❌ Import error: {e}")
-    print(f"Current working directory: {os.getcwd()}")
-    print(f"Files in current directory: {os.listdir('.')}")
-    sys.exit(1) 
+if __name__ == "__main__":
+    success = test_imports()
+    if not success:
+        sys.exit(1) 

@@ -149,7 +149,7 @@ class SocialSciencesAnalyzer:
                 return "text"
             else:
                 return "categorical"
-                    else:
+        else:
             return "unknown"
 
     def detect_likert_scales(self, df: pd.DataFrame) -> Dict[str, List[str]]:

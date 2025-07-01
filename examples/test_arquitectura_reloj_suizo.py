@@ -57,6 +57,12 @@ def test_imports():
         from processing.logging import log_action, setup_logging
         print("✅ processing.logging - OK")
         
+        # Utils
+        from processing.utils import (
+            obtener_info_archivo, validar_dataframe, summary_statistics, compute_correlations, contingency_analysis, normality_test, t_test_independent, linear_regression, plot_histogram, plot_boxplot, plot_scatter, plot_heatmap, plot_bar_chart, filter_by_condition, filter_by_range, filter_by_values, remove_outliers, handle_missing_values, sample_data, select_columns, drop_duplicates, create_numeric_features, encode_categorical, scale_features, create_interaction_features, select_features, create_time_features, create_binning_features
+        )
+        print("✅ processing.utils - OK")
+        
         return True
         
     except ImportError as e:

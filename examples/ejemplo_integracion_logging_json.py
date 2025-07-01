@@ -10,6 +10,7 @@ con el sistema actual.
 import pandas as pd
 import time
 from typing import Dict, Any, Optional
+from datetime import datetime
 
 # Importar componentes del pipeline existente
 from processing.json_logging import (

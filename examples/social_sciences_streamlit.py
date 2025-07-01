@@ -18,13 +18,13 @@ import matplotlib.pyplot as plt
 from social_sciences_analyzer import SocialSciencesAnalyzer, analyze_survey_data
 
 # Configuración de la página
-    st.set_page_config(
+st.set_page_config(
     page_title="Análisis de Ciencias Sociales", page_icon="🎓", layout="wide"
-    )
-    
+)
+
 # Título principal
 st.title("🎓 Analizador Avanzado de Datos de Ciencias Sociales")
-    st.markdown("---")
+st.markdown("---")
 
 # Inicializar session state
 if "analyzer" not in st.session_state:

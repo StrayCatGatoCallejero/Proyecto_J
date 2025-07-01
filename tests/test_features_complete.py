@@ -238,65 +238,64 @@ def test_pipeline_integration():
     print("\n🚀 Ejecutando pipeline completo con feature engineering...")
     orchestrator.run_full_pipeline(temp_file)
 
-        # Get session data
-        session_data = orchestrator.get_session_data()
+    session_data = orchestrator.get_session_data()
 
-        # Display feature engineering results
-        print("\n" + "=" * 60)
-        print("📊 RESULTADOS DE FEATURE ENGINEERING")
-        print("=" * 60)
+    # Display feature engineering results
+    print("\n" + "=" * 60)
+    print("📊 RESULTADOS DE FEATURE ENGINEERING")
+    print("=" * 60)
 
-        if "feature_engineering" in session_data.metadata:
-            feature_data = session_data.metadata["feature_engineering"]
+    if "feature_engineering" in session_data.metadata:
+        feature_data = session_data.metadata["feature_engineering"]
 
-            print(f"📋 Columnas originales: {len(feature_data['original_columns'])}")
-            print(f"🔧 Nuevas features: {len(feature_data['new_features'])}")
-            print(f"📊 Total features: {feature_data['total_features']}")
+        print(f"📋 Columnas originales: {len(feature_data['original_columns'])}")
+        print(f"🔧 Nuevas features: {len(feature_data['new_features'])}")
+        print(f"📊 Total features: {feature_data['total_features']}")
 
-            # Show feature types
-            feature_types = feature_data["feature_types"]
-            print(f"\n📈 Tipos de features generadas:")
-            for feature_type, features in feature_types.items():
-                if features:
-                    print(f"   - {feature_type}: {len(features)} features")
-                    for feature in features[:3]:  # Show first 3
-                        print(f"     • {feature}")
-                    if len(features) > 3:
-                        print(f"     • ... y {len(features) - 3} más")
+        # Show feature types
+        feature_types = feature_data["feature_types"]
+        print(f"\n📈 Tipos de features generadas:")
+        for feature_type, features in feature_types.items():
+            if features:
+                print(f"   - {feature_type}: {len(features)} features")
+                for feature in features[:3]:  # Show first 3
+                    print(f"     • {feature}")
+                if len(features) > 3:
+                    print(f"     • ... y {len(features) - 3} más")
 
-            # Show confidence intervals
-            if "confidence_intervals" in feature_data:
-                print(f"\n🎯 Intervalos de confianza calculados:")
-                for var, ci_info in feature_data["confidence_intervals"].items():
-                    ci = ci_info["confidence_interval"]
-                    se = ci_info["standard_error"]
-                    print(f"   - {var}: CI=({ci[0]:.2f}, {ci[1]:.2f}), SE={se:.4f}")
+        # Show confidence intervals
+        if "confidence_intervals" in feature_data:
+            print(f"\n🎯 Intervalos de confianza calculados:")
+            for var, ci_info in feature_data["confidence_intervals"].items():
+                ci = ci_info["confidence_interval"]
+                se = ci_info["standard_error"]
+                print(f"   - {var}: CI=({ci[0]:.2f}, {ci[1]:.2f}), SE={se:.4f}")
 
-            # Show bootstrap results
-            if "bootstrap_results" in feature_data:
-                print(f"\n🔄 Resultados bootstrap:")
-                for var, boot_info in feature_data["bootstrap_results"].items():
-                    mean = boot_info["bootstrap_mean"]
-                    ci = boot_info["ci"]
-                    print(f"   - {var}: mean={mean:.4f}, CI=({ci[0]:.4f}, {ci[1]:.4f})")
-        else:
-            print("❌ No se encontraron resultados de feature engineering")
+        # Show bootstrap results
+        if "bootstrap_results" in feature_data:
+            print(f"\n🔄 Resultados bootstrap:")
+            for var, boot_info in feature_data["bootstrap_results"].items():
+                mean = boot_info["bootstrap_mean"]
+                ci = boot_info["ci"]
+                print(f"   - {var}: mean={mean:.4f}, CI=({ci[0]:.4f}, {ci[1]:.4f})")
+    else:
+        print("❌ No se encontraron resultados de feature engineering")
 
-        # Export results
-        print(f"\n💾 Exportando resultados...")
-        output_path = (
-            f"reporte_features_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
-        )
+    # Export results
+    print(f"\n💾 Exportando resultados...")
+    output_path = (
+        f"reporte_features_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+    )
     orchestrator.export_results(output_path)
 
-        # Clean up
-        if os.path.exists(temp_file):
-            os.remove(temp_file)
-            print(f"🧹 Archivo temporal eliminado: {temp_file}")
+    # Clean up
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
+        print(f"🧹 Archivo temporal eliminado: {temp_file}")
 
-        print("\n" + "=" * 60)
-        print("🎉 PRUEBA DE INTEGRACIÓN COMPLETADA EXITOSAMENTE")
-        print("=" * 60)
+    print("\n" + "=" * 60)
+    print("🎉 PRUEBA DE INTEGRACIÓN COMPLETADA EXITOSAMENTE")
+    print("=" * 60)
 
 
 def test_feature_robustness():

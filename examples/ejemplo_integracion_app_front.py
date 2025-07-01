@@ -9,12 +9,13 @@ de negocio en la aplicación Streamlit existente.
 import streamlit as st
 import pandas as pd
 from typing import Dict, Any, List, Optional
-
-# Importar módulos del sistema de manejo de errores
+import numpy as np
+from datetime import datetime
 from processing.business_error_handler import (
     BusinessErrorHandler,
     display_business_errors_in_streamlit,
-    get_business_errors
+    get_business_errors,
+    BusinessError
 )
 from processing.business_rules import (
     validate_business_rules,

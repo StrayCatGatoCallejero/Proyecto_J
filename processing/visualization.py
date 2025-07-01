@@ -371,16 +371,16 @@ def plotly_histogram(df: pd.DataFrame, column: str, bins: int = 20) -> Any:
     Returns:
         Figura de plotly
     """
-        start_time = datetime.now()
-        
-        # Validar entrada
-        if column not in df.columns:
-            raise ValueError(f"La columna {column} no existe en el DataFrame")
-        
-        series = df[column].dropna()
-        if len(series) == 0:
-            raise ValueError("No hay datos válidos para graficar")
-        
+    start_time = datetime.now()
+    
+    # Validar entrada
+    if column not in df.columns:
+        raise ValueError(f"La columna {column} no existe en el DataFrame")
+    
+    series = df[column].dropna()
+    if len(series) == 0:
+        raise ValueError("No hay datos válidos para graficar")
+    
     try:
         # Crear histograma
         fig = go.Figure(data=[go.Histogram(x=series, nbinsx=bins)])
@@ -422,10 +422,10 @@ def plotly_heatmap(corr: pd.DataFrame) -> Any:
     Returns:
         Figura de plotly
     """
-        start_time = datetime.now()
-        
-        # Validar entrada
-        if corr.empty:
+    start_time = datetime.now()
+    
+    # Validar entrada
+    if corr.empty:
         raise ValueError("El DataFrame de correlaciones está vacío")
     
     try:
@@ -483,13 +483,13 @@ def plotly_scatter(df: pd.DataFrame, x_column: str, y_column: str,
     Returns:
         Figura de plotly
     """
-        start_time = datetime.now()
-        
-        # Validar entrada
-        for col in [x_column, y_column]:
-            if col not in df.columns:
-                raise ValueError(f"La columna {col} no existe en el DataFrame")
-        
+    start_time = datetime.now()
+    
+    # Validar entrada
+    for col in [x_column, y_column]:
+        if col not in df.columns:
+            raise ValueError(f"La columna {col} no existe en el DataFrame")
+    
     if color_column and color_column not in df.columns:
         raise ValueError(f"La columna {color_column} no existe en el DataFrame")
     

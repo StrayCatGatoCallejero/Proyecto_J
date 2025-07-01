@@ -270,80 +270,79 @@ def test_survey_analysis():
     print("\n🚀 Ejecutando pipeline completo...")
     orchestrator.run_full_pipeline(temp_file)
 
-        # Get session data
-        session_data = orchestrator.get_session_data()
+    session_data = orchestrator.get_session_data()
 
-        # Display results
-        print("\n" + "=" * 60)
-        print("📊 RESULTADOS DEL ANÁLISIS")
-        print("=" * 60)
+    # Display results
+    print("\n" + "=" * 60)
+    print("📊 RESULTADOS DEL ANÁLISIS")
+    print("=" * 60)
 
-        # Basic info
-        print(
-            f"📋 Datos: {session_data.df.shape[0]} filas × {session_data.df.shape[1]} columnas"
-        )
-        print(
-            f"🔍 Puede visualizar: {session_data.metadata.get('can_visualize', False)}"
-        )
+    # Basic info
+    print(
+        f"📋 Datos: {session_data.df.shape[0]} filas × {session_data.df.shape[1]} columnas"
+    )
+    print(
+        f"🔍 Puede visualizar: {session_data.metadata.get('can_visualize', False)}"
+    )
 
-        # Survey structure
-        if "survey_structure" in session_data.reports:
-            structure = session_data.reports["survey_structure"]
-            print(f"\n🏗️ Estructura de la encuesta:")
-            print(f"   {structure['narrative']}")
-            print(f"   Total preguntas: {structure['total_questions']}")
-            print(f"   Promedio datos faltantes: {structure['avg_missing_pct']}%")
+    # Survey structure
+    if "survey_structure" in session_data.reports:
+        structure = session_data.reports["survey_structure"]
+        print(f"\n🏗️ Estructura de la encuesta:")
+        print(f"   {structure['narrative']}")
+        print(f"   Total preguntas: {structure['total_questions']}")
+        print(f"   Promedio datos faltantes: {structure['avg_missing_pct']}%")
 
-            if "type_counts" in structure:
-                print(f"   Distribución por tipo:")
-                for sem_type, count in structure["type_counts"].items():
-                    print(f"     - {sem_type}: {count}")
+        if "type_counts" in structure:
+            print(f"   Distribución por tipo:")
+            for sem_type, count in structure["type_counts"].items():
+                print(f"     - {sem_type}: {count}")
 
-        # Frequency tables
-        if "frequency_tables" in session_data.reports:
-            freq_tables = session_data.reports["frequency_tables"]
-            print(f"\n📊 Tablas de frecuencia generadas: {len(freq_tables)}")
-            for col_name in freq_tables.keys():
-                print(f"   - {col_name}")
+    # Frequency tables
+    if "frequency_tables" in session_data.reports:
+        freq_tables = session_data.reports["frequency_tables"]
+        print(f"\n📊 Tablas de frecuencia generadas: {len(freq_tables)}")
+        for col_name in freq_tables.keys():
+            print(f"   - {col_name}")
 
-        # Crosstab summaries
-        if "crosstab_summaries" in session_data.reports:
-            summaries = session_data.reports["crosstab_summaries"]
-            print(f"\n📝 Resúmenes categóricos generados: {len(summaries)}")
-            for col_name, summary in list(summaries.items())[:3]:  # Show first 3
-                print(f"   - {col_name}: {summary[:100]}...")
+    # Crosstab summaries
+    if "crosstab_summaries" in session_data.reports:
+        summaries = session_data.reports["crosstab_summaries"]
+        print(f"\n📝 Resúmenes categóricos generados: {len(summaries)}")
+        for col_name, summary in list(summaries.items())[:3]:  # Show first 3
+            print(f"   - {col_name}: {summary[:100]}...")
 
-        # Textual summaries
-        if "textual_summaries" in session_data.reports:
-            text_summaries = session_data.reports["textual_summaries"]
-            print(f"\n📝 Análisis de texto generados: {len(text_summaries)}")
-            for col_name, text_data in text_summaries.items():
-                sentiment = text_data["sentiment"]
-                print(
-                    f"   - {col_name}: {sentiment['positive_pct']}% positivo, "
-                    f"{sentiment['negative_pct']}% negativo, {sentiment['neutral_pct']}% neutral"
-                )
+    # Textual summaries
+    if "textual_summaries" in session_data.reports:
+        text_summaries = session_data.reports["textual_summaries"]
+        print(f"\n📝 Análisis de texto generados: {len(text_summaries)}")
+        for col_name, text_data in text_summaries.items():
+            sentiment = text_data["sentiment"]
+            print(
+                f"   - {col_name}: {sentiment['positive_pct']}% positivo, "
+                f"{sentiment['negative_pct']}% negativo, {sentiment['neutral_pct']}% neutral"
+            )
 
-        # Data dictionary
-        if "data_dictionary" in session_data.reports:
-            data_dict = session_data.reports["data_dictionary"]
-            print(f"\n📚 Diccionario de datos generado: {len(data_dict)} variables")
+    # Data dictionary
+    if "data_dictionary" in session_data.reports:
+        data_dict = session_data.reports["data_dictionary"]
+        print(f"\n📚 Diccionario de datos generado: {len(data_dict)} variables")
 
-        # Export results
-        print(f"\n💾 Exportando resultados...")
-        output_path = (
-            f"reporte_encuesta_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
-        )
+    # Export results
+    print(f"\n💾 Exportando resultados...")
+    output_path = (
+        f"reporte_encuesta_{datetime.now().strftime('%Y%m%d_%H%M%S')}.html"
+    )
     orchestrator.export_results(output_path)
 
-        # Clean up
-        if os.path.exists(temp_file):
-            os.remove(temp_file)
-            print(f"🧹 Archivo temporal eliminado: {temp_file}")
+    # Clean up
+    if os.path.exists(temp_file):
+        os.remove(temp_file)
+        print(f"🧹 Archivo temporal eliminado: {temp_file}")
 
-        print("\n" + "=" * 60)
-        print("🎉 PRUEBA COMPLETADA EXITOSAMENTE")
-        print("=" * 60)
+    print("\n" + "=" * 60)
+    print("🎉 PRUEBA COMPLETADA EXITOSAMENTE")
+    print("=" * 60)
 
 
 if __name__ == "__main__":

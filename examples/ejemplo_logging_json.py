@@ -23,6 +23,7 @@ from processing.json_logging import (
     get_json_logger_manager
 )
 from processing.business_rules import validate_business_rules
+from processing.json_utils import to_serializable  # Ajusta el import si la función está en otro módulo
 
 
 def crear_datos_ejemplo() -> pd.DataFrame:

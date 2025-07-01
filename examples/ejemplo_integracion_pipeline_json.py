@@ -12,6 +12,7 @@ import time
 import json
 from datetime import datetime
 from typing import Dict, Any
+from processing.json_utils import to_serializable  # Ajusta el import si la función está en otro módulo
 
 # Importar el PipelineOrchestrator mejorado
 from orchestrator.pipeline_orchestrator import PipelineOrchestrator

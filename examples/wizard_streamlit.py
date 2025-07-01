@@ -14,6 +14,7 @@ import tempfile
 import base64
 import json
 from fpdf import FPDF
+from processing.json_utils import to_serializable  # Ajusta el import si la función está en otro módulo
 
 # Configuración de estilo
 plt.style.use("default")

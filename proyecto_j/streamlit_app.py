@@ -261,51 +261,26 @@ if st.sidebar.button("🔄 Reiniciar Asistente"):
 # Función para leer distintos formatos
 # ------------------------
 def load_file(uploaded):
-    """Carga archivo usando el pipeline modular con manejo de codificación"""
+    """Carga archivo usando el pipeline modular"""
     try:
         # Guardar archivo temporalmente
         temp_path = f"temp_{uploaded.name}"
         with open(temp_path, "wb") as f:
             f.write(uploaded.getbuffer())
-
-        # Intentar cargar directamente con pandas primero
-        file_extension = os.path.splitext(uploaded.name)[-1].lower()
-        
-        if file_extension == ".csv":
-            # Para archivos CSV, intentar diferentes codificaciones
-            encodings = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252']
-            df = None
-            
-            for encoding in encodings:
-                try:
-                    df = pd.read_csv(temp_path, encoding=encoding)
-                    break
-                except UnicodeDecodeError:
-                    continue
-            
-            if df is None:
-                # Si ninguna codificación funciona, usar la función del pipeline
-                df = cargar_datos(temp_path)
-        elif file_extension in [".xlsx", ".xls"]:
-            # Para archivos Excel, intentar diferentes engines
-            try:
-                if file_extension == ".xlsx":
-                    df = pd.read_excel(temp_path, engine='openpyxl')
-                else:
-                    df = pd.read_excel(temp_path, engine='xlrd')
-            except Exception:
-                # Si falla, intentar con engine por defecto
-                df = pd.read_excel(temp_path)
-        else:
-            # Para otros formatos, usar la función del pipeline
-            df = cargar_datos(temp_path)
-
-        # Limpiar archivo temporal
-        os.remove(temp_path)
-        return df
+        st.write(f"Tamaño archivo temporal: {os.path.getsize(temp_path)} bytes")
+        st.write(f"Nombre archivo temporal: {temp_path}")
+        ext = Path(temp_path).suffix.lower()
+        st.write(f"Extensión detectada: {ext}")
+        import sys
+        sys.path.append(str(Path(__file__).resolve().parent.parent / 'src'))
+        from analisis_demografico import cargar_datos
+        data = cargar_datos(str(temp_path))
+        st.session_state.data = data
+        st.success("Archivo cargado correctamente")
+        st.info(f"Datos: {data.shape[0]} filas × {data.shape[1]} columnas")
+        return data
     except Exception as e:
         st.error(f"Error al cargar archivo: {str(e)}")
-        st.info("💡 **Sugerencias:** Verifica que el archivo no esté corrupto o intenta con un archivo diferente")
         return None
 
 

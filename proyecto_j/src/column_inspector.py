@@ -127,6 +127,18 @@ def get_column_report(df):
     return pd.DataFrame(rows)
 
 
+def detect_column_types_simple(df):
+    """Devuelve un dict con el tipo detectado para cada columna."""
+    return {col: detect_type(df[col]) for col in df.columns}
+
+# Alias para compatibilidad con tests
+
+detect_column_types = get_column_report
+
+# Alias para compatibilidad con tests
+suggest_visualizations = suggest_analysis
+
+
 # Para uso directo en scripts/tests
 def main():
     import sys

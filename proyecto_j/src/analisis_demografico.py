@@ -12,6 +12,8 @@ import subprocess
 import os
 import sys
 from typing import Union, List, Dict, Any
+import chardet
+from pathlib import Path
 
 # ============================================================================
 # 1. Carga de Datos
@@ -20,13 +22,14 @@ from typing import Union, List, Dict, Any
 
 @st.cache_data
 def cargar_datos(path: str) -> pd.DataFrame:
+    path = Path(path)  # Asegura que path sea un objeto Path
     """
     Carga datos desde archivos .sav, .dta, .csv, .xls, o .xlsx.
     """
-    if not os.path.exists(path):
+    if not path.exists():
         raise FileNotFoundError(f"El archivo no se encuentra en la ruta: {path}")
 
-    filename = os.path.basename(path).lower()
+    filename = path.name.lower()
 
     try:
         if filename.endswith(".sav"):
@@ -34,7 +37,16 @@ def cargar_datos(path: str) -> pd.DataFrame:
         elif filename.endswith(".dta"):
             df, _ = pyreadstat.read_dta(path)
         elif filename.endswith(".csv"):
-            df = pd.read_csv(path)
+            # Detectar encoding con chardet
+            with open(path, 'rb') as f:
+                rawdata = f.read(10000)
+                result = chardet.detect(rawdata)
+                encoding = result['encoding'] if result['encoding'] else 'utf-8'
+            try:
+                df = pd.read_csv(path, encoding=encoding)
+            except UnicodeDecodeError:
+                # Fallback a latin1 si falla el encoding detectado
+                df = pd.read_csv(path, encoding='latin1')
         elif filename.endswith((".xlsx", ".xls")):
             df = pd.read_excel(path)
         else:

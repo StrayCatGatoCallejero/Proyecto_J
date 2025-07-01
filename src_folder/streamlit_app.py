@@ -14,6 +14,10 @@ from sklearn.preprocessing import PolynomialFeatures
 from sklearn.metrics import r2_score, mean_squared_error
 from sklearn.model_selection import train_test_split
 from collections import Counter
+import chardet
+import sys
+sys.path.append(str(Path(__file__).resolve().parent.parent / 'proyecto_j' / 'src'))
+from analisis_demografico import cargar_datos
 
 # =====================
 # ESTILOS Y CONFIGURACIÓN
@@ -147,21 +151,16 @@ def step_1():
             temp_path = temp_dir / f"upload_{int(time.time())}_{uploaded_file.name}"
             with open(temp_path, "wb") as f:
                 f.write(uploaded_file.getbuffer())
+            st.write(f"Tamaño archivo temporal: {os.path.getsize(temp_path)} bytes")
             ext = temp_path.suffix.lower()
+            st.write(f"Nombre archivo temporal: {temp_path}")
+            st.write(f"Extensión detectada: {ext}")
+            with open(temp_path, 'rb') as f:
+                first_bytes = f.read(20)
+            st.write(f"Primeros bytes del archivo: {first_bytes}")
+            # Logs antes de cada intento de carga
             try:
-                if ext == ".csv":
-                    data = pd.read_csv(temp_path)
-                elif ext in [".xlsx", ".xls"]:
-                    data = pd.read_excel(temp_path, engine="openpyxl")
-                elif ext == ".sav":
-                    import pyreadstat
-
-                    data, _ = pyreadstat.read_sav(temp_path)
-                elif ext == ".dta":
-                    data = pd.read_stata(temp_path)
-                else:
-                    st.error("Tipo de archivo no soportado")
-                    return
+                data = cargar_datos(str(temp_path))
                 st.session_state.data = data
                 st.success("Archivo cargado correctamente")
                 st.info(f"Datos: {data.shape[0]} filas × {data.shape[1]} columnas")

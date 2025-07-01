@@ -31,7 +31,7 @@ jobs:
     
     - name: Run verification script
       run: |
-        python check_python_version.py
+        python scripts/check_python_version.py
     
     - name: Run basic tests
       run: |

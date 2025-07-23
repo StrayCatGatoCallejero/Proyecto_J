@@ -6,8 +6,6 @@ services:
     buildCommand: pip install -r requirements.txt
     startCommand: streamlit run streamlit_app_simple.py --server.port $PORT --server.address 0.0.0.0
     envVars:
-      - key: PYTHON_VERSION
-        value: 3.10.12
       - key: DISPLAY
         value: ":99"
     healthCheckPath: / 

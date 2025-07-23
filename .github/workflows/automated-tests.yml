@@ -1,0 +1,280 @@
+name: Automated Tests
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  schedule:
+    # Ejecutar pruebas diariamente a las 6:00 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    # Permitir ejecución manual
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        python-version: [3.8, 3.9, "3.10", "3.11"]
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    
+    - name: Cache pip dependencies
+      uses: actions/cache@v3
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ matrix.python-version }}-${{ hashFiles('**/requirements*.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-${{ matrix.python-version }}-
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_unified.txt
+        pip install pytest pytest-cov pytest-mock
+    
+    - name: Run automated tests
+      run: |
+        python scripts/run_automated_tests.py
+    
+    - name: Run specific file upload tests
+      run: |
+        python -m pytest tests/test_file_upload_integration.py -v --tb=short
+    
+    - name: Test Streamlit app imports
+      run: |
+        cd proyecto_j
+        python -c "
+        import sys
+        sys.path.insert(0, '.')
+        from streamlit_app import load_file, check_system_status
+        print('✅ Streamlit app imports successful')
+        "
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: test-results-${{ matrix.python-version }}
+        path: |
+          logs/
+          .pytest_cache/
+        retention-days: 30
+    
+    - name: Create test summary
+      if: always()
+      run: |
+        echo "## Test Results for Python ${{ matrix.python-version }}" >> $GITHUB_STEP_SUMMARY
+        if [ -f "logs/test_results.json" ]; then
+          echo "### Automated Tests Summary" >> $GITHUB_STEP_SUMMARY
+          cat logs/test_results.json | jq -r '.summary | "**Total:** \(.total) | **Passed:** \(.passed) | **Failed:** \(.failed) | **Skipped:** \(.skipped)"' >> $GITHUB_STEP_SUMMARY
+        fi
+        if [ -f "logs/automated_tests.log" ]; then
+          echo "### Recent Log Entries" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          tail -20 logs/automated_tests.log >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+        fi
+
+  file-upload-specific:
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements_unified.txt
+        pip install pytest pytest-mock
+    
+    - name: Create test files
+      run: |
+        python -c "
+        import pandas as pd
+        import numpy as np
+        from pathlib import Path
+        
+        # Crear datos de prueba
+        test_data = pd.DataFrame({
+            'id': range(1, 11),
+            'nombre': ['Test ' + str(i) for i in range(1, 11)],
+            'valor': np.random.randn(10)
+        })
+        
+        # Guardar en diferentes formatos
+        test_data.to_csv('test_file.csv', index=False)
+        test_data.to_excel('test_file.xlsx', index=False)
+        
+        print('✅ Test files created')
+        "
+    
+    - name: Test file upload functionality
+      run: |
+        python -c "
+        import pandas as pd
+        from pathlib import Path
+        
+        # Probar carga de archivos
+        csv_data = pd.read_csv('test_file.csv')
+        excel_data = pd.read_excel('test_file.xlsx')
+        
+        assert len(csv_data) == 10, f'CSV should have 10 rows, got {len(csv_data)}'
+        assert len(excel_data) == 10, f'Excel should have 10 rows, got {len(excel_data)}'
+        
+        print('✅ File upload functionality working correctly')
+        "
+    
+    - name: Cleanup test files
+      if: always()
+      run: |
+        rm -f test_file.csv test_file.xlsx
+
+  dependency-check:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Check critical dependencies
+      run: |
+        python -c "
+        critical_deps = ['pandas', 'numpy', 'streamlit', 'plotly']
+        missing_deps = []
+        
+        for dep in critical_deps:
+            try:
+                __import__(dep)
+                print(f'✅ {dep} - AVAILABLE')
+            except ImportError:
+                missing_deps.append(dep)
+                print(f'❌ {dep} - MISSING')
+        
+        if missing_deps:
+            raise Exception(f'Missing critical dependencies: {missing_deps}')
+        
+        print('✅ All critical dependencies available')
+        "
+    
+    - name: Check optional dependencies
+      run: |
+        python -c "
+        optional_deps = ['chardet', 'openpyxl', 'pyreadstat', 'missingno', 'fpdf2']
+        
+        for dep in optional_deps:
+            try:
+                __import__(dep)
+                print(f'✅ {dep} - AVAILABLE')
+            except ImportError:
+                print(f'⚠️ {dep} - NOT AVAILABLE (optional)')
+        "
+
+  code-quality:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: "3.10"
+    
+    - name: Install linting tools
+      run: |
+        pip install flake8 black isort
+    
+    - name: Check code syntax
+      run: |
+        python -c "
+        import os
+        from pathlib import Path
+        
+        python_files = []
+        for root, dirs, files in os.walk('.'):
+            if '.git' in root or '__pycache__' in root:
+                continue
+            for file in files:
+                if file.endswith('.py'):
+                    python_files.append(os.path.join(root, file))
+        
+        syntax_errors = []
+        for file_path in python_files:
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    compile(f.read(), file_path, 'exec')
+                print(f'✅ {file_path} - Syntax OK')
+            except SyntaxError as e:
+                syntax_errors.append(f'{file_path}: {str(e)}')
+                print(f'❌ {file_path} - Syntax Error')
+        
+        if syntax_errors:
+            raise Exception(f'Syntax errors found: {syntax_errors}')
+        
+        print('✅ All Python files have valid syntax')
+        "
+    
+    - name: Check code formatting with Black
+      run: |
+        black --check --diff proyecto_j/ scripts/ tests/
+    
+    - name: Check imports with isort
+      run: |
+        isort --check-only --diff proyecto_j/ scripts/ tests/
+    
+    - name: Lint with flake8
+      run: |
+        flake8 proyecto_j/ scripts/ tests/ --max-line-length=100 --ignore=E203,W503
+
+  notify:
+    runs-on: ubuntu-latest
+    needs: [test, file-upload-specific, dependency-check, code-quality]
+    if: always()
+    
+    steps:
+    - name: Check test results
+      id: check-results
+      run: |
+        if [ "${{ needs.test.result }}" == "success" ] && [ "${{ needs.file-upload-specific.result }}" == "success" ] && [ "${{ needs.dependency-check.result }}" == "success" ] && [ "${{ needs.code-quality.result }}" == "success" ]; then
+          echo "status=success" >> $GITHUB_OUTPUT
+          echo "message=All tests passed successfully! 🎉" >> $GITHUB_OUTPUT
+        else
+          echo "status=failure" >> $GITHUB_OUTPUT
+          echo "message=Some tests failed. Please check the logs. ❌" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create final summary
+      run: |
+        echo "## 🧪 Automated Test Results" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Test Jobs:**" >> $GITHUB_STEP_SUMMARY
+        echo "- Main Tests: ${{ needs.test.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- File Upload: ${{ needs.file-upload-specific.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Dependencies: ${{ needs.dependency-check.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Code Quality: ${{ needs.code-quality.result }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Overall Status:** ${{ steps.check-results.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Message:** ${{ steps.check-results.outputs.message }}" >> $GITHUB_STEP_SUMMARY 

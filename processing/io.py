@@ -1,760 +1,533 @@
 """
-Módulo de I/O - Patrón "Reloj Suizo"
-====================================
+Módulo de I/O Robusto y Seguro - Proyecto J
+===========================================
 
 Responsabilidades:
-- Carga de archivos de datos (.sav, .dta, .csv, .xlsx)
-- Validación de entrada y manejo de errores
-- Logging sistemático de operaciones
-- Metadatos consistentes y estructurados
-- Validación automática de entrada usando decoradores
+- Carga segura de archivos con validación de tipos
+- Detección automática de encoding
+- Manejo robusto de errores de archivo
+- Validación de seguridad de archivos
+- Gestión de memoria para archivos grandes
+- Logging detallado de operaciones I/O
 """
 
 import os
+import sys
+import tempfile
+import hashlib
+from pathlib import Path
+from typing import Dict, Any, Optional, Union, Tuple, List
+import warnings
+import logging
+from datetime import datetime
+from dataclasses import dataclass, field
+
 import pandas as pd
 import numpy as np
-import chardet
-from typing import Tuple, Dict, Any, Optional
-import warnings
-from datetime import datetime
-import time
+from chardet import detect as chardet_detect
 
-warnings.filterwarnings("ignore")
-
-# Importar logging y validación
+# Importar módulos del sistema
 from .logging import log_action
+from .error_reporter import report_dataframe_error
 from .validation_decorators import validate_io, create_dataframe_schema
-from .json_logging import LogLevel, LogCategory, serialize_for_json
+
+# Configurar logging
+logger = logging.getLogger(__name__)
+
+# Constantes de seguridad
+MAX_FILE_SIZE_MB = 100  # Tamaño máximo de archivo en MB
+ALLOWED_EXTENSIONS = {'.csv', '.xlsx', '.xls', '.sav', '.dta', '.json', '.parquet'}
+DANGEROUS_EXTENSIONS = {'.exe', '.bat', '.cmd', '.sh', '.py', '.js', '.html', '.htm'}
+MAX_COLUMNS = 1000  # Máximo número de columnas
+MAX_ROWS_PREVIEW = 10000  # Máximo filas para preview
+
+# Configuración de encoding
+ENCODINGS_TO_TRY = ['utf-8', 'latin-1', 'iso-8859-1', 'cp1252', 'utf-16']
 
 
-def log_io_operation(func):
+class FileSecurityError(Exception):
+    """Excepción para errores de seguridad de archivos"""
+    pass
+
+
+class FileValidationError(Exception):
+    """Excepción para errores de validación de archivos"""
+    pass
+
+
+class MemoryLimitError(Exception):
+    """Excepción para errores de límite de memoria"""
+    pass
+
+
+@dataclass
+class FileMetadata:
+    """Metadatos de archivo para auditoría y validación"""
+    filename: str
+    file_size: int
+    file_hash: str
+    extension: str
+    encoding: Optional[str] = None
+    loaded_at: datetime = field(default_factory=datetime.now)
+    columns_count: int = 0
+    rows_count: int = 0
+    memory_usage_mb: float = 0.0
+    load_time_seconds: float = 0.0
+
+
+def validate_file_security(file_path: Union[str, Path]) -> None:
     """
-    Decorador para logging JSON de operaciones de I/O.
+    Valida la seguridad de un archivo antes de procesarlo.
     
     Args:
-        func: Función a decorar
-    """
-    def wrapper(*args, **kwargs):
-        start_time = time.time()
-        operation_name = func.__name__
-        
-        # Extraer información del archivo si está disponible
-        file_path = None
-        if args and isinstance(args[0], str):
-            file_path = args[0]
-        
-        try:
-            # Log de inicio de operación
-            if hasattr(wrapper, 'json_logger'):
-                wrapper.json_logger.log_event(
-                    level=LogLevel.INFO,
-                    message=f"Iniciando operación de I/O: {operation_name}",
-                    module=func.__module__,
-                    function=func.__name__,
-                    step="io_operation",
-                    category=LogCategory.DATA_LOAD.value,
-                    parameters={"file_path": file_path, "args_count": len(args), "kwargs_count": len(kwargs)},
-                    before_metrics={"file_path": file_path},
-                    after_metrics={"file_path": file_path},
-                    execution_time=0.0,
-                    tags=["io_operation", operation_name, "start"],
-                    metadata={"operation": operation_name}
-                )
-            
-            # Ejecutar función
-            result = func(*args, **kwargs)
-            
-            execution_time = time.time() - start_time
-            
-            # Calcular métricas del resultado
-            after_metrics = {}
-            if isinstance(result, pd.DataFrame):
-                after_metrics = {
-                    "rows": len(result),
-                    "columns": len(result.columns),
-                    "memory_usage_mb": result.memory_usage(deep=True).sum() / (1024 * 1024),
-                    "data_types": result.dtypes.value_counts().to_dict(),
-                    "missing_values": result.isnull().sum().sum()
-                }
-            elif isinstance(result, tuple) and len(result) > 0 and isinstance(result[0], pd.DataFrame):
-                df = result[0]
-                after_metrics = {
-                    "rows": len(df),
-                    "columns": len(df.columns),
-                    "memory_usage_mb": df.memory_usage(deep=True).sum() / (1024 * 1024),
-                    "data_types": df.dtypes.value_counts().to_dict(),
-                    "missing_values": df.isnull().sum().sum(),
-                    "metadata_included": len(result) > 1
-                }
-            
-            # Log de éxito
-            if hasattr(wrapper, 'json_logger'):
-                wrapper.json_logger.log_event(
-                    level=LogLevel.INFO,
-                    message=f"Operación de I/O completada: {operation_name}",
-                    module=func.__module__,
-                    function=func.__name__,
-                    step="io_operation",
-                    category=LogCategory.DATA_LOAD.value,
-                    parameters={"file_path": file_path},
-                    before_metrics={"file_path": file_path},
-                    after_metrics=after_metrics,
-                    execution_time=execution_time,
-                    tags=["io_operation", operation_name, "success"],
-                    metadata={
-                        "operation": operation_name,
-                        "result_type": type(result).__name__,
-                        "success": True
-                    }
-                )
-            
-            return result
-            
-        except Exception as e:
-            execution_time = time.time() - start_time
-            
-            # Log de error
-            if hasattr(wrapper, 'json_logger'):
-                wrapper.json_logger.log_error(
-                    function=func.__name__,
-                    error=e,
-                    context=f"io_operation_{operation_name}",
-                    execution_time=execution_time,
-                    additional_data={
-                        "file_path": file_path,
-                        "operation": operation_name,
-                        "args": str(args),
-                        "kwargs": str(kwargs)
-                    }
-                )
-            
-            raise
-    
-    return wrapper
-
-
-class DataLoader:
-    """
-    Clase para carga de datos con detección automática de formato.
-    """
-    
-    def __init__(self, json_logger=None):
-        """
-        Inicializa el DataLoader.
-        
-        Args:
-            json_logger: Logger JSON opcional para logging estructurado
-        """
-        self.detected_format = None
-        self.supported_formats = ['.sav', '.dta', '.csv', '.xlsx', '.xls']
-        self.json_logger = json_logger
-    
-    @log_io_operation
-    def load_file(self, file_path: str) -> Optional[pd.DataFrame]:
-        """
-        Carga un archivo de datos con detección automática de formato.
-        
-        Args:
-            file_path: Ruta al archivo de datos
-            
-        Returns:
-            DataFrame cargado o None si hay error
-        """
-        try:
-            # Obtener información del archivo
-            file_info = self._get_file_info(file_path)
-            
-            # Log de información del archivo
-            if self.json_logger:
-                self.json_logger.log_event(
-                    level=LogLevel.INFO,
-                    message=f"Información del archivo obtenida: {file_path}",
-                    module=self.__class__.__module__,
-                    function="load_file",
-                    step="file_info",
-                    category=LogCategory.DATA_LOAD.value,
-                    parameters={"file_path": file_path},
-                    before_metrics={"file_path": file_path},
-                    after_metrics=file_info,
-                    execution_time=0.0,
-                    tags=["file_info", "metadata"],
-                    metadata=file_info
-                )
-            
-            # Detectar formato
-            ext = os.path.splitext(file_path)[1].lower()
-            self.detected_format = ext
-            
-            if ext not in self.supported_formats:
-                raise ValueError(f"Formato no soportado: {ext}")
-            
-            # Cargar archivo según formato
-            if ext == '.csv':
-                df = self._load_csv(file_path)
-            elif ext in ['.xlsx', '.xls']:
-                df = self._load_excel(file_path)
-            elif ext == '.sav':
-                df = self._load_sav(file_path)
-            elif ext == '.dta':
-                df = self._load_dta(file_path)
-            else:
-                raise ValueError(f"Formato no soportado: {ext}")
-            
-            # Log de carga exitosa
-            if self.json_logger and df is not None:
-                self.json_logger.log_event(
-                    level=LogLevel.INFO,
-                    message=f"Archivo cargado exitosamente: {file_path}",
-                    module=self.__class__.__module__,
-                    function="load_file",
-                    step="file_loaded",
-                    category=LogCategory.DATA_LOAD.value,
-                    parameters={"file_path": file_path, "format": ext},
-                    before_metrics=file_info,
-                    after_metrics={
-                        "rows": len(df),
-                        "columns": len(df.columns),
-                        "memory_usage_mb": df.memory_usage(deep=True).sum() / (1024 * 1024),
-                        "format": ext
-                    },
-                    execution_time=0.0,
-                    tags=["file_loaded", "success"],
-                    metadata={"format": ext, "file_info": file_info}
-                )
-            
-            return df
-            
-        except Exception as e:
-            # Log de error de carga
-            if self.json_logger:
-                self.json_logger.log_error(
-                    function="load_file",
-                    error=e,
-                    context="file_loading",
-                    execution_time=0.0,
-                    additional_data={
-                        "file_path": file_path,
-                        "detected_format": self.detected_format
-                    }
-                )
-            raise
-    
-    def _get_file_info(self, file_path: str) -> Dict[str, Any]:
-        """Obtiene información detallada del archivo."""
-        try:
-            stat = os.stat(file_path)
-            return {
-                "file_size_bytes": stat.st_size,
-                "file_size_mb": stat.st_size / (1024 * 1024),
-                "last_modified": datetime.fromtimestamp(stat.st_mtime).isoformat(),
-                "extension": os.path.splitext(file_path)[1].lower(),
-                "filename": os.path.basename(file_path),
-                "directory": os.path.dirname(file_path)
-            }
-        except Exception as e:
-            return {"error": f"Error obteniendo información del archivo: {str(e)}"}
-    
-    def _load_csv(self, file_path: str) -> pd.DataFrame:
-        """Carga archivo CSV con detección de encoding."""
-        try:
-            # Detectar encoding
-            with open(file_path, 'rb') as f:
-                raw_data = f.read()
-                detected = chardet.detect(raw_data)
-                encoding = detected['encoding']
-            
-            # Log de encoding detectado
-            if self.json_logger:
-                self.json_logger.log_event(
-                    level=LogLevel.DEBUG,
-                    message=f"Encoding detectado para CSV: {encoding}",
-                    module=self.__class__.__module__,
-                    function="_load_csv",
-                    step="encoding_detection",
-                    category=LogCategory.DATA_LOAD.value,
-                    parameters={"file_path": file_path},
-                    before_metrics={"encoding": encoding},
-                    after_metrics={"encoding": encoding},
-                    execution_time=0.0,
-                    tags=["encoding_detection", "csv"],
-                    metadata={"detected_encoding": encoding, "confidence": detected.get('confidence', 0)}
-                )
-            
-            return pd.read_csv(file_path, encoding=encoding)
-            
-        except Exception as e:
-            # Fallback a encoding por defecto
-            if self.json_logger:
-                self.json_logger.log_event(
-                    level=LogLevel.WARNING,
-                    message=f"Fallback a encoding por defecto para CSV: {file_path}",
-                    module=self.__class__.__module__,
-                    function="_load_csv",
-                    step="encoding_fallback",
-                    category=LogCategory.DATA_LOAD.value,
-                    parameters={"file_path": file_path},
-                    before_metrics={"encoding": "default"},
-                    after_metrics={"encoding": "default"},
-                    execution_time=0.0,
-                    tags=["encoding_fallback", "csv"],
-                    metadata={"error": str(e)}
-                )
-            
-            return pd.read_csv(file_path)
-    
-    def _load_excel(self, file_path: str) -> pd.DataFrame:
-        """Carga archivo Excel."""
-        return pd.read_excel(file_path)
-    
-    def _load_sav(self, file_path: str) -> pd.DataFrame:
-        """Carga archivo SPSS (.sav)."""
-        try:
-            # Intentar usar pyreadstat si está disponible
-            import pyreadstat
-            df, meta = pyreadstat.read_sav(file_path)
-            
-            # Log de metadatos SPSS
-            if self.json_logger:
-                self.json_logger.log_event(
-                    level=LogLevel.INFO,
-                    message=f"Metadatos SPSS cargados: {file_path}",
-                    module=self.__class__.__module__,
-                    function="_load_sav",
-                    step="spss_metadata",
-                    category=LogCategory.DATA_LOAD.value,
-                    parameters={"file_path": file_path},
-                    before_metrics={"format": "spss"},
-                    after_metrics={
-                        "format": "spss",
-                        "variable_labels": len(meta.get('variable_labels', {})),
-                        "value_labels": len(meta.get('value_labels', {}))
-                    },
-                    execution_time=0.0,
-                    tags=["spss", "metadata"],
-                    metadata={"spss_metadata": meta}
-                )
-            
-            return df
-            
-        except ImportError:
-            # Fallback a CSV si pyreadstat no está disponible
-            if self.json_logger:
-                self.json_logger.log_event(
-                    level=LogLevel.WARNING,
-                    message=f"pyreadstat no disponible, fallback a CSV: {file_path}",
-                    module=self.__class__.__module__,
-                    function="_load_sav",
-                    step="spss_fallback",
-                    category=LogCategory.DATA_LOAD.value,
-                    parameters={"file_path": file_path},
-                    before_metrics={"format": "spss"},
-                    after_metrics={"format": "csv_fallback"},
-                    execution_time=0.0,
-                    tags=["spss_fallback", "csv"],
-                    metadata={"fallback_reason": "pyreadstat_not_available"}
-                )
-            
-            return pd.read_csv(file_path)
-    
-    def _load_dta(self, file_path: str) -> pd.DataFrame:
-        """Carga archivo Stata (.dta)."""
-        try:
-            return pd.read_stata(file_path)
-        except Exception as e:
-            # Fallback a CSV
-            if self.json_logger:
-                self.json_logger.log_event(
-                    level=LogLevel.WARNING,
-                    message=f"Error cargando Stata, fallback a CSV: {file_path}",
-                    module=self.__class__.__module__,
-                    function="_load_dta",
-                    step="stata_fallback",
-                    category=LogCategory.DATA_LOAD.value,
-                    parameters={"file_path": file_path},
-                    before_metrics={"format": "stata"},
-                    after_metrics={"format": "csv_fallback"},
-                    execution_time=0.0,
-                    tags=["stata_fallback", "csv"],
-                    metadata={"error": str(e)}
-                )
-            
-            return pd.read_csv(file_path)
-
-
-# Esquema específico para validación de rutas de archivos
-class FilePathSchema:
-    """Esquema para validación de rutas de archivos"""
-    def __init__(self, required_extensions: Optional[list] = None):
-        self.required_extensions = required_extensions or ['.sav', '.dta', '.csv', '.xlsx', '.xls']
-    
-    def validate_path(self, path: str, context: str) -> Dict[str, Any]:
-        """Valida una ruta de archivo"""
-        from .data_validators import ValidationResult
-        
-        # Verificar que la ruta existe
-        if not os.path.exists(path):
-            return {
-                'is_valid': False,
-                'errors': [f"El archivo no existe: {path}"],
-                'warnings': [],
-                'details': {'path': path, 'exists': False}
-            }
-        
-        # Verificar que es un archivo (no directorio)
-        if not os.path.isfile(path):
-            return {
-                'is_valid': False,
-                'errors': [f"La ruta no es un archivo: {path}"],
-                'warnings': [],
-                'details': {'path': path, 'is_file': False}
-            }
-        
-        # Verificar extensión
-        ext = os.path.splitext(path)[1].lower()
-        if ext not in self.required_extensions:
-            return {
-                'is_valid': False,
-                'errors': [f"Extensión no soportada: {ext}. Extensiones válidas: {self.required_extensions}"],
-                'warnings': [],
-                'details': {'extension': ext, 'supported_extensions': self.required_extensions}
-            }
-        
-        # Verificar que el archivo no esté vacío
-        size = os.path.getsize(path)
-        if size == 0:
-            return {
-                'is_valid': False,
-                'errors': ["El archivo está vacío"],
-                'warnings': [],
-                'details': {'file_size': size}
-            }
-        
-        return {
-            'is_valid': True,
-            'errors': [],
-            'warnings': [],
-            'details': {'path': path, 'extension': ext, 'file_size': size}
-        }
-
-
-# Esquema específico para DataFrames cargados
-class LoadedDataFrameSchema(create_dataframe_schema(min_rows=1)):
-    """Esquema para DataFrames cargados desde archivos"""
-    def validate_dataframe(self, df: pd.DataFrame, context: str):
-        """Validación específica para DataFrames cargados"""
-        from .data_validators import ValidationResult
-        
-        # Verificar que el DataFrame no esté completamente vacío
-        if df.empty:
-            return ValidationResult(
-                is_valid=False,
-                errors=["El DataFrame cargado está completamente vacío"],
-                warnings=[],
-                details={"shape": df.shape, "columns": list(df.columns)}
-            )
-        
-        # Verificar que hay al menos una columna
-        if len(df.columns) == 0:
-            return ValidationResult(
-                is_valid=False,
-                errors=["El DataFrame cargado no tiene columnas"],
-                warnings=[],
-                details={"shape": df.shape, "columns": list(df.columns)}
-            )
-        
-        # Verificar que las columnas no son todas nulas
-        non_null_columns = df.columns[df.notna().any()].tolist()
-        if len(non_null_columns) == 0:
-            return ValidationResult(
-                is_valid=False,
-                errors=["Todas las columnas del DataFrame están completamente vacías"],
-                warnings=[],
-                details={"shape": df.shape, "columns": list(df.columns), "non_null_columns": non_null_columns}
-            )
-        
-        return super().validate_dataframe(df, context)
-
-
-def validate_file_path(func):
-    """Decorador específico para validación de rutas de archivos"""
-    def wrapper(path: str, *args, **kwargs):
-        # Validar ruta antes de procesar
-        schema = FilePathSchema()
-        validation = schema.validate_path(path, f"{func.__module__}.{func.__name__}")
-        
-        if not validation['is_valid']:
-            from .error_reporter import report_dataframe_error
-            report_dataframe_error(
-                message=f"Ruta de archivo inválida en {func.__name__}: {validation['errors'][0]}",
-                context=f"{func.__module__}.{func.__name__}",
-                details={
-                    "validation_errors": validation['errors'],
-                    "validation_warnings": validation['warnings'],
-                    "validation_details": validation['details'],
-                    "function_name": func.__name__,
-                    "module": func.__module__
-                }
-            )
-        
-        return func(path, *args, **kwargs)
-    
-    return wrapper
-
-
-@validate_file_path
-@validate_io(df_schema=LoadedDataFrameSchema)
-def cargar_archivo(path: str) -> Tuple[pd.DataFrame, Dict[str, Any]]:
-    """
-    Carga un archivo .sav/.dta/.csv/.xlsx y devuelve (df, metadata).
-    Metadata incluye: format, n_rows, n_cols, variable_labels (si aplica).
-    
-    Esta función está protegida por validación automática que:
-    1. Verifica que la ruta del archivo existe y es válida
-    2. Valida que el archivo no esté vacío y tenga formato soportado
-    3. Verifica que el DataFrame cargado tenga datos válidos
-    4. Reporta errores detallados si la validación falla
-    
-    Args:
-        path: Ruta del archivo a cargar
-        
-    Returns:
-        Tuple: (DataFrame, metadata)
+        file_path: Ruta al archivo a validar
         
     Raises:
-        FileNotFoundError: Si el archivo no existe
-        ValueError: Si el archivo está vacío o formato no soportado
+        FileSecurityError: Si el archivo no es seguro
+    """
+    file_path = Path(file_path)
+    
+    # Verificar extensión peligrosa
+    if file_path.suffix.lower() in DANGEROUS_EXTENSIONS:
+        raise FileSecurityError(
+            f"Extensión de archivo peligrosa: {file_path.suffix}"
+        )
+    
+    # Verificar que el archivo existe
+    if not file_path.exists():
+        raise FileSecurityError(f"El archivo no existe: {file_path}")
+    
+    # Verificar tamaño del archivo
+    file_size_mb = file_path.stat().st_size / (1024 * 1024)
+    if file_size_mb > MAX_FILE_SIZE_MB:
+        raise FileSecurityError(
+            f"Archivo demasiado grande: {file_size_mb:.2f}MB > {MAX_FILE_SIZE_MB}MB"
+        )
+    
+    # Verificar que es un archivo regular
+    if not file_path.is_file():
+        raise FileSecurityError(f"No es un archivo regular: {file_path}")
+    
+    logger.info(f"✅ Validación de seguridad exitosa para: {file_path}")
+
+
+def calculate_file_hash(file_path: Union[str, Path]) -> str:
+    """
+    Calcula el hash SHA-256 de un archivo para verificación de integridad.
+    
+    Args:
+        file_path: Ruta al archivo
+        
+    Returns:
+        Hash SHA-256 del archivo
+    """
+    file_path = Path(file_path)
+    hash_sha256 = hashlib.sha256()
+    
+    with open(file_path, "rb") as f:
+        for chunk in iter(lambda: f.read(4096), b""):
+            hash_sha256.update(chunk)
+    
+    return hash_sha256.hexdigest()
+
+
+def detect_encoding(file_path: Union[str, Path]) -> str:
+    """
+    Detecta el encoding de un archivo de forma robusta.
+        
+        Args:
+        file_path: Ruta al archivo
+            
+        Returns:
+        Encoding detectado
+    """
+    file_path = Path(file_path)
+    
+    try:
+        # Leer una muestra del archivo para detectar encoding
+        with open(file_path, 'rb') as f:
+            raw_data = f.read(10000)  # Leer primeros 10KB
+        
+        if not raw_data:
+            return 'utf-8'
+        
+        # Usar chardet para detectar encoding
+        result = chardet_detect(raw_data)
+        detected_encoding = result['encoding']
+        confidence = result['confidence']
+        
+        logger.info(f"Encoding detectado: {detected_encoding} (confianza: {confidence:.2f})")
+        
+        # Si la confianza es baja, usar utf-8 por defecto
+        if confidence < 0.7:
+            logger.warning(f"Baja confianza en encoding detectado: {confidence:.2f}")
+            return 'utf-8'
+        
+        return detected_encoding or 'utf-8'
+        
+    except Exception as e:
+        logger.warning(f"Error detectando encoding: {e}")
+        return 'utf-8'
+
+
+@validate_io
+def load_csv_safe(
+    file_path: Union[str, Path], 
+    encoding: Optional[str] = None,
+    chunk_size: Optional[int] = None
+) -> Tuple[pd.DataFrame, FileMetadata]:
+    """
+    Carga un archivo CSV de forma segura con manejo robusto de encoding.
+    
+    Args:
+        file_path: Ruta al archivo CSV
+        encoding: Encoding específico (opcional)
+        chunk_size: Tamaño de chunk para archivos grandes (opcional)
+        
+    Returns:
+        Tupla con DataFrame y metadatos del archivo
+        
+    Raises:
+        FileSecurityError: Si el archivo no es seguro
+        FileValidationError: Si hay errores de validación
     """
     start_time = datetime.now()
+    file_path = Path(file_path)
     
-    # La validación automática ya se encargó de verificar la entrada
-    # Detectar formato
-    ext = path.lower().rsplit('.', 1)[-1]
-    size = os.path.getsize(path)
-    metadata = {'format': ext, 'file_size': size}
+    # Validar seguridad del archivo
+    validate_file_security(file_path)
+    
+    # Calcular hash del archivo
+    file_hash = calculate_file_hash(file_path)
+    
+    # Detectar encoding si no se especifica
+    if encoding is None:
+        encoding = detect_encoding(file_path)
+    
+    # Intentar diferentes encodings si el detectado falla
+    encodings_to_try = [encoding] + [enc for enc in ENCODINGS_TO_TRY if enc != encoding]
+    
+    df = None
+    used_encoding = None
+    
+    for enc in encodings_to_try:
+        try:
+            if chunk_size:
+                # Cargar en chunks para archivos grandes
+                chunks = []
+                for chunk in pd.read_csv(file_path, encoding=enc, chunksize=chunk_size):
+                    chunks.append(chunk)
+                    if len(chunks) * chunk_size > MAX_ROWS_PREVIEW:
+                        logger.warning(f"Archivo muy grande, cargando solo preview")
+                        break
+                df = pd.concat(chunks, ignore_index=True)
+            else:
+                df = pd.read_csv(file_path, encoding=enc)
+            
+            used_encoding = enc
+            logger.info(f"✅ CSV cargado exitosamente con encoding: {enc}")
+            break
+            
+        except UnicodeDecodeError:
+            logger.debug(f"Encoding {enc} falló, intentando siguiente...")
+            continue
+        except Exception as e:
+            logger.warning(f"Error con encoding {enc}: {e}")
+            continue
+    
+    if df is None:
+        raise FileValidationError(f"No se pudo cargar el archivo CSV: {file_path}")
+    
+    # Validar DataFrame
+    validate_dataframe(df, file_path)
+    
+    # Calcular metadatos
+    load_time = (datetime.now() - start_time).total_seconds()
+    memory_usage = df.memory_usage(deep=True).sum() / (1024 * 1024)  # MB
+    
+    metadata = FileMetadata(
+        filename=file_path.name,
+        file_size=file_path.stat().st_size,
+        file_hash=file_hash,
+        extension=file_path.suffix.lower(),
+        encoding=used_encoding,
+        columns_count=len(df.columns),
+        rows_count=len(df),
+        memory_usage_mb=memory_usage,
+        load_time_seconds=load_time
+    )
+    
+    logger.info(f"📊 Archivo cargado: {metadata.rows_count:,} filas × {metadata.columns_count} columnas")
+    logger.info(f"💾 Uso de memoria: {memory_usage:.2f}MB")
+    
+    return df, metadata
+
+
+@validate_io
+def load_excel_safe(
+    file_path: Union[str, Path],
+    sheet_name: Optional[Union[str, int]] = 0,
+    engine: Optional[str] = None
+) -> Tuple[pd.DataFrame, FileMetadata]:
+    """
+    Carga un archivo Excel de forma segura.
+    
+    Args:
+        file_path: Ruta al archivo Excel
+        sheet_name: Nombre o índice de la hoja
+        engine: Motor de Excel (openpyxl, xlrd)
+        
+    Returns:
+        Tupla con DataFrame y metadatos del archivo
+    """
+    start_time = datetime.now()
+    file_path = Path(file_path)
+    
+    # Validar seguridad del archivo
+    validate_file_security(file_path)
+    
+    # Calcular hash del archivo
+    file_hash = calculate_file_hash(file_path)
+    
+    # Determinar engine basado en extensión
+    if engine is None:
+        if file_path.suffix.lower() == '.xlsx':
+            engine = 'openpyxl'
+        elif file_path.suffix.lower() == '.xls':
+            engine = 'xlrd'
+        else:
+            engine = 'openpyxl'  # Por defecto
     
     try:
-        if ext == 'sav':
-            df, meta = _cargar_sav(path)
-            metadata.update({
-                'variable_labels': meta.variable_labels if hasattr(meta, 'variable_labels') else {},
-                'value_labels': meta.value_labels if hasattr(meta, 'value_labels') else {}
-            })
-        elif ext == 'dta':
-            df, meta = _cargar_dta(path)
-            metadata.update({
-                'variable_labels': meta.variable_labels if hasattr(meta, 'variable_labels') else {}
-            })
-        elif ext == 'csv':
-            df = _cargar_csv(path)
-        elif ext in ('xls', 'xlsx'):
-            df = _cargar_excel(path)
-        else:
-            raise ValueError(f"Formato no soportado: {ext}")
-        
-        # Post-proceso genérico
-        df = df.rename(columns=str.strip).copy()
-        metadata.update({
-            'n_rows': len(df),
-            'n_cols': len(df.columns),
-            'load_time': (datetime.now() - start_time).total_seconds()
-        })
-        
-        # Limpiar metadatos para serialización JSON
-        cleaned_metadata = serialize_for_json(metadata)
-        
-        return df, cleaned_metadata
+        df = pd.read_excel(file_path, sheet_name=sheet_name, engine=engine)
+        logger.info(f"✅ Excel cargado exitosamente con engine: {engine}")
         
     except Exception as e:
-        # Log del error
-        log_action(
-            function="cargar_archivo",
-            step="file_loading",
-            parameters={"path": path, "format": ext},
-            before_metrics={"file_size": size},
-            after_metrics={},
-            status="error",
-            message=f"Error cargando archivo: {str(e)}",
-            execution_time=(datetime.now() - start_time).total_seconds(),
-            error_details=str(e)
-        )
-        raise
+        # Intentar con engine alternativo
+        alternative_engine = 'openpyxl' if engine == 'xlrd' else 'xlrd'
+        try:
+            df = pd.read_excel(file_path, sheet_name=sheet_name, engine=alternative_engine)
+            logger.info(f"✅ Excel cargado con engine alternativo: {alternative_engine}")
+        except Exception as e2:
+            raise FileValidationError(f"No se pudo cargar el archivo Excel: {e2}")
+    
+    # Validar DataFrame
+    validate_dataframe(df, file_path)
+    
+    # Calcular metadatos
+    load_time = (datetime.now() - start_time).total_seconds()
+    memory_usage = df.memory_usage(deep=True).sum() / (1024 * 1024)  # MB
+    
+    metadata = FileMetadata(
+        filename=file_path.name,
+        file_size=file_path.stat().st_size,
+        file_hash=file_hash,
+        extension=file_path.suffix.lower(),
+        columns_count=len(df.columns),
+        rows_count=len(df),
+        memory_usage_mb=memory_usage,
+        load_time_seconds=load_time
+    )
+    
+    return df, metadata
 
 
-@validate_file_path
-def _cargar_sav(path: str) -> Tuple[pd.DataFrame, Dict[str, Any]]:
-    """Carga archivo .sav (SPSS)"""
+@validate_io
+def load_spss_safe(file_path: Union[str, Path]) -> Tuple[pd.DataFrame, FileMetadata]:
+    """
+    Carga un archivo SPSS (.sav) de forma segura.
+    
+    Args:
+        file_path: Ruta al archivo SPSS
+        
+    Returns:
+        Tupla con DataFrame y metadatos del archivo
+    """
+    start_time = datetime.now()
+    file_path = Path(file_path)
+    
+    # Validar seguridad del archivo
+    validate_file_security(file_path)
+    
+    # Verificar que pyreadstat esté disponible
     try:
         import pyreadstat
-        df, meta = pyreadstat.read_sav(path)
-        return df, meta
     except ImportError:
-        raise ImportError("pyreadstat no está instalado. Instalar con: pip install pyreadstat")
-    except Exception as e:
-        raise ValueError(f"Error cargando archivo .sav: {e}")
-
-
-@validate_file_path
-def _cargar_dta(path: str) -> Tuple[pd.DataFrame, Dict[str, Any]]:
-    """Carga archivo .dta (Stata)"""
+        raise FileValidationError(
+            "pyreadstat no está instalado. Instala con: pip install pyreadstat"
+        )
+    
+    # Calcular hash del archivo
+    file_hash = calculate_file_hash(file_path)
+    
     try:
-        df = pd.read_stata(path)
-        meta = {'variable_labels': {}}  # Placeholder
-        return df, meta
-    except Exception as e:
-        raise ValueError(f"Error cargando archivo .dta: {e}")
-
-
-@validate_file_path
-def _cargar_csv(path: str) -> pd.DataFrame:
-    """Carga archivo .csv con detección automática de encoding"""
-    try:
-        # Detectar encoding
-        with open(path, 'rb') as f:
-            raw_data = f.read()
-            result = chardet.detect(raw_data)
-            encoding = result['encoding']
-        
-        # Intentar cargar con encoding detectado
-        try:
-            df = pd.read_csv(path, encoding=encoding)
-        except UnicodeDecodeError:
-            # Fallback a utf-8
-            df = pd.read_csv(path, encoding='utf-8')
-        
-        return df
+        df, meta = pyreadstat.read_sav(file_path)
+        logger.info(f"✅ Archivo SPSS cargado exitosamente")
         
     except Exception as e:
-        raise ValueError(f"Error cargando archivo .csv: {e}")
+        raise FileValidationError(f"No se pudo cargar el archivo SPSS: {e}")
+    
+    # Validar DataFrame
+    validate_dataframe(df, file_path)
+    
+    # Calcular metadatos
+    load_time = (datetime.now() - start_time).total_seconds()
+    memory_usage = df.memory_usage(deep=True).sum() / (1024 * 1024)  # MB
+    
+    metadata = FileMetadata(
+        filename=file_path.name,
+        file_size=file_path.stat().st_size,
+        file_hash=file_hash,
+        extension=file_path.suffix.lower(),
+        columns_count=len(df.columns),
+        rows_count=len(df),
+        memory_usage_mb=memory_usage,
+        load_time_seconds=load_time
+    )
+    
+    return df, metadata
 
 
-@validate_file_path
-def _cargar_excel(path: str) -> pd.DataFrame:
-    """Carga archivo .xlsx/.xls"""
-    try:
-        df = pd.read_excel(path)
-        return df
-    except Exception as e:
-        raise ValueError(f"Error cargando archivo Excel: {e}")
-
-
-@validate_io(df_schema=LoadedDataFrameSchema)
-def validar_dataframe(df: pd.DataFrame, metadata: Dict[str, Any]) -> Dict[str, Any]:
+def validate_dataframe(df: pd.DataFrame, file_path: Union[str, Path]) -> None:
     """
-    Valida un DataFrame cargado y retorna reporte de validación.
+    Valida un DataFrame cargado para asegurar que es seguro y válido.
     
     Args:
         df: DataFrame a validar
-        metadata: Metadatos del archivo
+        file_path: Ruta del archivo original
         
-    Returns:
-        Dict con resultados de validación
+    Raises:
+        FileValidationError: Si el DataFrame no es válido
+        MemoryLimitError: Si el DataFrame es demasiado grande
     """
-    start_time = datetime.now()
+    if df is None or df.empty:
+        raise FileValidationError("El DataFrame está vacío")
     
-    validation_results = {
-        'is_valid': True,
-        'errors': [],
-        'warnings': [],
-        'details': {
-            'shape': df.shape,
-            'columns': list(df.columns),
-            'dtypes': df.dtypes.to_dict(),
-            'missing_values': df.isnull().sum().to_dict(),
-            'duplicate_rows': df.duplicated().sum()
-        }
-    }
+    if len(df.columns) > MAX_COLUMNS:
+        raise FileValidationError(
+            f"Demasiadas columnas: {len(df.columns)} > {MAX_COLUMNS}"
+        )
     
-    # Validaciones específicas
-    if df.empty:
-        validation_results['is_valid'] = False
-        validation_results['errors'].append("DataFrame está vacío")
+    # Verificar uso de memoria
+    memory_usage_mb = df.memory_usage(deep=True).sum() / (1024 * 1024)
+    if memory_usage_mb > MAX_FILE_SIZE_MB:
+        raise MemoryLimitError(
+            f"DataFrame demasiado grande en memoria: {memory_usage_mb:.2f}MB"
+        )
     
-    if len(df.columns) == 0:
-        validation_results['is_valid'] = False
-        validation_results['errors'].append("DataFrame no tiene columnas")
+    # Verificar tipos de datos sospechosos
+    suspicious_columns = []
+    for col in df.columns:
+        if df[col].dtype == 'object':
+            # Verificar si hay código potencialmente peligroso
+            sample_values = df[col].dropna().astype(str).str[:100]
+            if any('eval(' in val or 'exec(' in val for val in sample_values):
+                suspicious_columns.append(col)
     
-    # Verificar columnas completamente vacías
-    empty_columns = df.columns[df.isnull().all()].tolist()
-    if empty_columns:
-        validation_results['warnings'].append(f"Columnas completamente vacías: {empty_columns}")
+    if suspicious_columns:
+        logger.warning(f"Columnas sospechosas detectadas: {suspicious_columns}")
     
-    # Verificar filas duplicadas
-    if df.duplicated().sum() > 0:
-        validation_results['warnings'].append(f"Hay {df.duplicated().sum()} filas duplicadas")
-    
-    # Log de validación
-    log_action(
-        function="validar_dataframe",
-        step="dataframe_validation",
-        parameters={"metadata": metadata},
-        before_metrics={"shape": df.shape},
-        after_metrics={
-            "is_valid": validation_results['is_valid'],
-            "errors_count": len(validation_results['errors']),
-            "warnings_count": len(validation_results['warnings'])
-        },
-        status="success" if validation_results['is_valid'] else "error",
-        message=f"Validación DataFrame: {'Válido' if validation_results['is_valid'] else 'Inválido'}",
-        execution_time=(datetime.now() - start_time).total_seconds(),
-        error_details="; ".join(validation_results['errors']) if validation_results['errors'] else None
-    )
-    
-    return validation_results
+    logger.info(f"✅ DataFrame validado: {len(df)} filas × {len(df.columns)} columnas")
 
 
-def obtener_info_archivo(path: str) -> Dict[str, Any]:
+def save_dataframe_safe(
+    df: pd.DataFrame,
+    file_path: Union[str, Path],
+    format: str = 'csv',
+    **kwargs
+) -> FileMetadata:
     """
-    Obtiene información básica de un archivo sin cargarlo completamente.
+    Guarda un DataFrame de forma segura con validaciones.
     
     Args:
-        path: Ruta al archivo
+        df: DataFrame a guardar
+        file_path: Ruta de destino
+        format: Formato de salida (csv, excel, parquet, json)
+        **kwargs: Argumentos adicionales para el formato
         
     Returns:
-        Dict con información del archivo
+        Metadatos del archivo guardado
     """
+    file_path = Path(file_path)
+    
+    # Validar DataFrame
+    if df is None or df.empty:
+        raise FileValidationError("No hay datos para guardar")
+    
+    # Crear directorio si no existe
+    file_path.parent.mkdir(parents=True, exist_ok=True)
+    
+    start_time = datetime.now()
+    
     try:
-        if not os.path.exists(path):
-            return {
-                'exists': False,
-                'error': 'Archivo no encontrado'
-            }
+        if format.lower() == 'csv':
+            df.to_csv(file_path, index=False, **kwargs)
+        elif format.lower() in ['excel', 'xlsx']:
+            df.to_excel(file_path, index=False, **kwargs)
+        elif format.lower() == 'parquet':
+            df.to_parquet(file_path, **kwargs)
+        elif format.lower() == 'json':
+            df.to_json(file_path, orient='records', **kwargs)
+        else:
+            raise FileValidationError(f"Formato no soportado: {format}")
         
-        info = {
-            'exists': True,
-            'path': path,
-            'size_bytes': os.path.getsize(path),
-            'extension': os.path.splitext(path)[1].lower(),
-            'modified_time': datetime.fromtimestamp(os.path.getmtime(path)).isoformat()
-        }
-        
-        # Información específica por formato
-        ext = info['extension']
-        if ext == '.csv':
-            # Leer primeras líneas para detectar separador y encoding
-            with open(path, 'rb') as f:
-                raw_data = f.read(1024)
-                result = chardet.detect(raw_data)
-                info['encoding'] = result['encoding']
-                
-            # Detectar separador
-            with open(path, 'r', encoding=info['encoding']) as f:
-                first_line = f.readline()
-                separators = [',', ';', '\t', '|']
-                detected_sep = None
-                for sep in separators:
-                    if sep in first_line:
-                        detected_sep = sep
-                        break
-                info['separator'] = detected_sep
-        
-        elif ext in ['.xlsx', '.xls']:
-            # Información básica de Excel
-            info['excel_sheets'] = pd.ExcelFile(path).sheet_names
-        
-        return info
+        logger.info(f"✅ DataFrame guardado exitosamente: {file_path}")
         
     except Exception as e:
-        return {
-            'exists': False,
-            'error': str(e)
-        }
+        raise FileValidationError(f"Error guardando archivo: {e}")
+    
+    # Calcular metadatos
+    save_time = (datetime.now() - start_time).total_seconds()
+    file_hash = calculate_file_hash(file_path)
+    memory_usage = df.memory_usage(deep=True).sum() / (1024 * 1024)  # MB
+    
+    metadata = FileMetadata(
+        filename=file_path.name,
+        file_size=file_path.stat().st_size,
+        file_hash=file_hash,
+        extension=file_path.suffix.lower(),
+        columns_count=len(df.columns),
+        rows_count=len(df),
+        memory_usage_mb=memory_usage,
+        load_time_seconds=save_time
+    )
+    
+    return metadata
+
+
+def get_file_info(file_path: Union[str, Path]) -> Dict[str, Any]:
+    """
+    Obtiene información detallada de un archivo sin cargarlo.
+    
+    Args:
+        file_path: Ruta al archivo
+        
+    Returns:
+        Diccionario con información del archivo
+    """
+    file_path = Path(file_path)
+    
+    if not file_path.exists():
+        return {"error": "Archivo no encontrado"}
+    
+    stat = file_path.stat()
+        
+        info = {
+        "filename": file_path.name,
+        "extension": file_path.suffix.lower(),
+        "size_bytes": stat.st_size,
+        "size_mb": stat.st_size / (1024 * 1024),
+        "created": datetime.fromtimestamp(stat.st_ctime),
+        "modified": datetime.fromtimestamp(stat.st_mtime),
+        "is_safe_extension": file_path.suffix.lower() in ALLOWED_EXTENSIONS,
+        "is_dangerous_extension": file_path.suffix.lower() in DANGEROUS_EXTENSIONS,
+    }
+    
+    # Detectar encoding si es un archivo de texto
+    if file_path.suffix.lower() in ['.csv', '.txt', '.json']:
+        try:
+            info["encoding"] = detect_encoding(file_path)
+        except Exception as e:
+            info["encoding_error"] = str(e)
+        
+        return info

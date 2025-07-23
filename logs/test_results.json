@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-07-08T17:42:16.607196",
+  "tests": {
+    "dependencies": {
+      "success": true,
+      "output": "{\n  \"pandas\": {\n    \"available\": true,\n    \"error\": null\n  },\n  \"numpy\": {\n    \"available\": true,\n    \"error\": null\n  },\n  \"streamlit\": {\n    \"available\": true,\n    \"error\": null\n  },\n  \"plotly\": {\n    \"available\": true,\n    \"error\": null\n  },\n  \"matplotlib\": {\n    \"available\": true,\n    \"error\": null\n  },\n  \"seaborn\": {\n    \"available\": true,\n    \"error\": null\n  },\n  \"chardet\": {\n    \"available\": true,\n    \"error\": null\n  },\n  \"openpyxl\": {\n    \"available\": true,\n    \"error\": null\n  },\n  \"pyreadstat\": {\n    \"available\": true,\n    \"error\": null\n  }\n}",
+      "returncode": 0
+    },
+    "code_quality": {
+      "success": true,
+      "output": "Sin errores de sintaxis",
+      "returncode": 0
+    },
+    "streamlit_imports": {
+      "success": true,
+      "output": "Imports exitosos",
+      "returncode": 0
+    },
+    "data_loading_simulation": {
+      "success": false,
+      "output": "[WinError 32] El proceso no tiene acceso al archivo porque está siendo utilizado por otro proceso: 'C:\\\\Users\\\\StrayCat\\\\AppData\\\\Local\\\\Temp\\\\tmp5c1m6jl6.csv'",
+      "returncode": -1
+    },
+    "file_upload": {
+      "success": false,
+      "output": "============================= test session starts =============================\nplatform win32 -- Python 3.13.1, pytest-8.4.1, pluggy-1.6.0 -- C:\\Python313\\python.exe\ncachedir: .pytest_cache\nrootdir: C:\\Users\\StrayCat\\Documents\\Proyecto_J\\tests\nconfigfile: pytest.ini\ncollecting ... collected 9 items\n\ntests\\test_file_upload_integration.py::TestFileUploadIntegration::test_csv_utf8_loading PASSED [ 11%]\ntests\\test_file_upload_integration.py::TestFileUploadIntegration::test_csv_latin1_loading PASSED [ 22%]\ntests\\test_file_upload_integration.py::TestFileUploadIntegration::test_excel_loading PASSED [ 33%]\ntests\\test_file_upload_integration.py::TestFileUploadIntegration::test_invalid_file_handling PASSED [ 44%]\ntests\\test_file_upload_integration.py::TestFileUploadIntegration::test_none_file_handling PASSED [ 55%]\ntests\\test_file_upload_integration.py::TestFileUploadIntegration::test_corrupted_csv_handling FAILED [ 66%]\ntests\\test_file_upload_integration.py::TestFileUploadUnit::test_file_extension_detection PASSED [ 77%]\ntests\\test_file_upload_integration.py::TestFileUploadUnit::test_encoding_detection FAILED [ 88%]\ntests\\test_file_upload_integration.py::TestFileUploadUnit::test_pandas_loading_methods FAILED [100%]\n\n================================== FAILURES ===================================\n____________ TestFileUploadIntegration.test_corrupted_csv_handling ____________\ntests\\test_file_upload_integration.py:201: in test_corrupted_csv_handling\n    mock_warning.assert_called()  # Debería mostrar advertencias sobre encoding\n    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nC:\\Python313\\Lib\\unittest\\mock.py:946: in assert_called\n    raise AssertionError(msg)\nE   AssertionError: Expected 'warning' to have been called.\n_________________ TestFileUploadUnit.test_encoding_detection __________________\ntests\\test_file_upload_integration.py:240: in test_encoding_detection\n    assert result['encoding'] in ['iso-8859-1', 'latin-1']\nE   AssertionError: assert 'ISO-8859-7' in ['iso-8859-1', 'latin-1']\n_______________ TestFileUploadUnit.test_pandas_loading_methods ________________\ntests\\test_file_upload_integration.py:258: in test_pandas_loading_methods\n    os.unlink(f.name)\nE   PermissionError: [WinError 32] El proceso no tiene acceso al archivo porque está siendo utilizado por otro proceso: 'C:\\\\Users\\\\StrayCat\\\\AppData\\\\Local\\\\Temp\\\\tmpayyi_gf7.csv'\n=========================== short test summary info ===========================\nFAILED tests\\test_file_upload_integration.py::TestFileUploadIntegration::test_corrupted_csv_handling\nFAILED tests\\test_file_upload_integration.py::TestFileUploadUnit::test_encoding_detection\nFAILED tests\\test_file_upload_integration.py::TestFileUploadUnit::test_pandas_loading_methods\n======================== 3 failed, 6 passed in 19.48s =========================\n",
+      "returncode": 1
+    }
+  },
+  "summary": {
+    "total": 5,
+    "passed": 3,
+    "failed": 2,
+    "skipped": 0
+  }
+}

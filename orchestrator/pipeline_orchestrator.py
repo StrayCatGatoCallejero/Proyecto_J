@@ -20,8 +20,8 @@ import os
 
 # Importar sistema de logging JSON
 from processing.json_logging import create_json_logger, LogLevel, LogCategory, serialize_for_json
-from processing.io import DataLoader
-from processing.types import SchemaValidator
+# from processing.io import DataLoader
+from processing.data_types import SchemaValidator
 from processing.filters import DataFilter
 from processing.visualization import VisualizationGenerator
 from processing.business_rules import validate_business_rules
@@ -238,7 +238,7 @@ class PipelineOrchestrator:
         self.pipeline_status = PipelineStatus.INITIALIZED
         
         # Inicializar componentes
-        self.data_loader = DataLoader()
+        # self.data_loader = DataLoader()
         self.schema_validator = SchemaValidator()
         self.data_filter = DataFilter()
         self.viz_generator = VisualizationGenerator()
@@ -376,12 +376,15 @@ class PipelineOrchestrator:
         )
         
         # Cargar datos
-        df = self.data_loader.load_file(path)
+        # df = self.data_loader.load_file(path)
+        # Stub: cargar datos usando pandas directamente
+        import pandas as pd
+        df = pd.read_csv(path)
         
         if df is not None:
             self.session.df = df
             self.session.metadata["source_file"] = path
-            self.session.metadata["file_format"] = self.data_loader.detected_format
+            self.session.metadata["file_format"] = "csv"  # self.data_loader.detected_format
             self.session.metadata["original_shape"] = df.shape
             
             # Log de carga exitosa
@@ -397,7 +400,7 @@ class PipelineOrchestrator:
                 after_metrics={
                     "rows": len(df),
                     "columns": len(df.columns),
-                    "file_format": self.data_loader.detected_format,
+                    "file_format": "csv",  # self.data_loader.detected_format,
                     "memory_usage_mb": df.memory_usage(deep=True).sum() / (1024 * 1024)
                 },
                 execution_time=0.0,

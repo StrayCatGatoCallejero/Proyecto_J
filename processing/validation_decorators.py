@@ -139,7 +139,7 @@ def validate_io(
 # Esquemas específicos para diferentes tipos de operaciones
 class SummaryStatsSchema(DataFrameModel):
     """Esquema para estadísticas descriptivas"""
-    required_columns: List[str] = []
+    required_columns: List[str] = Field(default_factory=lambda: ["any_numeric"])
     optional_columns: List[str] = []
     min_rows: int = 1
     
@@ -155,12 +155,21 @@ class SummaryStatsSchema(DataFrameModel):
                 details={"numeric_columns": numeric_cols}
             )
         
-        return super().validate_dataframe(df, context)
+        # Crear un esquema dinámico con las columnas numéricas encontradas
+        dynamic_schema = DataFrameSchema(
+            required_columns=numeric_cols[:1],  # Al menos una columna numérica
+            optional_columns=numeric_cols[1:],  # El resto como opcionales
+            min_rows=self.min_rows,
+            max_rows=self.max_rows,
+            column_types=self.column_types
+        )
+        
+        return validate_dataframe(df, dynamic_schema, context)
 
 
 class CorrelationSchema(DataFrameModel):
     """Esquema para análisis de correlación"""
-    required_columns: List[str] = []
+    required_columns: List[str] = Field(default_factory=lambda: ["any_numeric"])
     optional_columns: List[str] = []
     min_rows: int = 3  # Mínimo para correlación
     
@@ -176,19 +185,28 @@ class CorrelationSchema(DataFrameModel):
                 details={"numeric_columns": numeric_cols}
             )
         
-        return super().validate_dataframe(df, context)
+        # Crear un esquema dinámico con las columnas numéricas encontradas
+        dynamic_schema = DataFrameSchema(
+            required_columns=numeric_cols[:2],  # Al menos 2 columnas numéricas
+            optional_columns=numeric_cols[2:],  # El resto como opcionales
+            min_rows=self.min_rows,
+            max_rows=self.max_rows,
+            column_types=self.column_types
+        )
+        
+        return validate_dataframe(df, dynamic_schema, context)
 
 
 class FilterSchema(DataFrameModel):
     """Esquema para operaciones de filtrado"""
-    required_columns: List[str] = []
+    required_columns: List[str] = Field(default_factory=lambda: ["any_column"])
     optional_columns: List[str] = []
     min_rows: int = 1
     
     def validate_dataframe(self, df: pd.DataFrame, context: str) -> ValidationResult:
         """Validación específica para filtros"""
         # Verificar que las columnas requeridas existen
-        missing_cols = [col for col in self.required_columns if col not in df.columns]
+        missing_cols = [col for col in self.required_columns if col not in df.columns and col != "any_column"]
         if missing_cols:
             return ValidationResult(
                 is_valid=False,
@@ -197,7 +215,23 @@ class FilterSchema(DataFrameModel):
                 details={"missing_columns": missing_cols, "available_columns": list(df.columns)}
             )
         
-        return super().validate_dataframe(df, context)
+        # Crear un esquema dinámico con al menos una columna
+        if len(df.columns) > 0:
+            dynamic_schema = DataFrameSchema(
+                required_columns=df.columns[:1],  # Al menos una columna
+                optional_columns=df.columns[1:],  # El resto como opcionales
+                min_rows=self.min_rows,
+                max_rows=self.max_rows,
+                column_types=self.column_types
+            )
+            return validate_dataframe(df, dynamic_schema, context)
+        else:
+            return ValidationResult(
+                is_valid=False,
+                errors=["El DataFrame debe contener al menos una columna"],
+                warnings=[],
+                details={"available_columns": list(df.columns)}
+            )
 
 
 # Esquemas de parámetros específicos
@@ -290,9 +324,34 @@ def create_dataframe_schema(
     class DynamicDataFrameSchema(DataFrameModel):
         def __init__(self, **kwargs):
             super().__init__(**kwargs)
-            self.required_columns = required_columns or []
+            self.required_columns = required_columns or ["any_column"]
             self.optional_columns = optional_columns or []
             self.min_rows = min_rows
             self.max_rows = max_rows
             self.column_types = column_types
+        
+        def validate_dataframe(self, df: pd.DataFrame, context: str) -> ValidationResult:
+            """Validación dinámica que se adapta al contenido del DataFrame"""
+            # Si no hay columnas requeridas específicas, usar las del DataFrame
+            if not self.required_columns or self.required_columns == ["any_column"]:
+                if len(df.columns) > 0:
+                    dynamic_schema = DataFrameSchema(
+                        required_columns=df.columns[:1],  # Al menos una columna
+                        optional_columns=df.columns[1:],  # El resto como opcionales
+                        min_rows=self.min_rows,
+                        max_rows=self.max_rows,
+                        column_types=self.column_types
+                    )
+                    return validate_dataframe(df, dynamic_schema, context)
+                else:
+                    return ValidationResult(
+                        is_valid=False,
+                        errors=["El DataFrame debe contener al menos una columna"],
+                        warnings=[],
+                        details={"available_columns": list(df.columns)}
+                    )
+            else:
+                # Usar validación estándar si hay columnas requeridas específicas
+                return super().validate_dataframe(df, context)
+    
     return DynamicDataFrameSchema 

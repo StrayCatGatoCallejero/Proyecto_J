@@ -659,6 +659,55 @@ def buscar_geografia_chile(termino: str, tipo: str = "todos") -> pd.DataFrame:
     return pd.DataFrame(resultados)
 
 
+def validar_datos_chile(df: pd.DataFrame) -> Dict[str, Union[bool, List[str]]]:
+    """
+    Función principal para validar datos de Chile.
+    
+    Args:
+        df: DataFrame a validar
+        
+    Returns:
+        Diccionario con resultados de validación
+    """
+    resultados = {
+        "valido": True,
+        "errores": [],
+        "advertencias": [],
+        "columnas_geograficas": []
+    }
+    
+    # Detectar columnas geográficas
+    columnas_geograficas = []
+    for col in df.columns:
+        col_lower = col.lower()
+        if any(term in col_lower for term in ['region', 'comuna', 'provincia', 'geografia']):
+            columnas_geograficas.append(col)
+    
+    resultados["columnas_geograficas"] = columnas_geograficas
+    
+    if not columnas_geograficas:
+        resultados["advertencias"].append("No se detectaron columnas geográficas específicas")
+        return resultados
+    
+    # Validar cada columna geográfica
+    for col in columnas_geograficas:
+        col_lower = col.lower()
+        
+        if 'region' in col_lower:
+            es_valido, errores = validar_region(df, col)
+            if not es_valido:
+                resultados["valido"] = False
+                resultados["errores"].extend(errores)
+        
+        if 'comuna' in col_lower:
+            es_valido, errores = validar_comuna(df, col)
+            if not es_valido:
+                resultados["valido"] = False
+                resultados["errores"].extend(errores)
+    
+    return resultados
+
+
 if __name__ == "__main__":
     # Pruebas básicas
     print("Cargando referencias...")

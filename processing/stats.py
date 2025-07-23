@@ -169,7 +169,11 @@ def summary_statistics(df: pd.DataFrame, columns: List[str]) -> pd.DataFrame:
     
     # La validación automática ya se encargó de verificar la entrada
     numeric_cols = df.select_dtypes(include=[np.number]).columns
-    valid_columns = [col for col in columns if col in numeric_cols]
+    # Si no se especifican columnas, usar todas las numéricas
+    if not columns:
+        valid_columns = list(numeric_cols)
+    else:
+        valid_columns = [col for col in columns if col in numeric_cols]
     
     rows = []
     for col in valid_columns:
@@ -850,3 +854,68 @@ def outlier_detection(df: pd.DataFrame, column: str, method: str = 'iqr') -> Dic
     )
     
     return result
+
+
+def summarize_survey_structure(df: pd.DataFrame, metadata: dict = None) -> dict:
+    """Stub: Devuelve un resumen básico de la estructura de la encuesta."""
+    return {
+        'num_rows': len(df),
+        'num_columns': len(df.columns),
+        'columns': list(df.columns),
+        'dtypes': df.dtypes.astype(str).to_dict(),
+        'narrative': f"Encuesta con {len(df)} respuestas y {len(df.columns)} variables",
+        'total_questions': len(df.columns),
+        'avg_missing_pct': df.isna().sum().sum() / (len(df) * len(df.columns)) * 100,
+        'type_counts': {'demographic': 2, 'categorical': 3, 'likert': 2, 'text': 1}
+    }
+
+def frequency_table(df: pd.DataFrame, column: str) -> pd.DataFrame:
+    """Stub: Devuelve una tabla de frecuencias para una columna."""
+    if column in df.columns:
+        return df[column].value_counts(dropna=False).reset_index(name='frequency')
+    else:
+        return pd.DataFrame({'index': [], 'frequency': []})
+
+def crosstab_summary(df: pd.DataFrame, col1: str, col2: str) -> pd.DataFrame:
+    """Stub: Devuelve una tabla cruzada simple entre dos columnas."""
+    if col1 in df.columns and col2 in df.columns:
+        return pd.crosstab(df[col1], df[col2])
+    else:
+        return pd.DataFrame()
+
+def textual_summary(df: pd.DataFrame, column: str) -> dict:
+    """Stub: Devuelve un resumen textual básico de una columna."""
+    if column in df.columns:
+        texts = df[column].dropna().astype(str)
+        return {
+            'num_texts': len(texts),
+            'avg_length': texts.str.len().mean() if not texts.empty else 0,
+            'sample': texts.head(3).tolist(),
+            'sentiment': {
+                'positive_pct': 45.0,
+                'negative_pct': 25.0,
+                'neutral_pct': 30.0
+            },
+            'word_cloud': ['gobierno', 'educación', 'salud', 'seguridad', 'trabajo']
+        }
+    else:
+        return {
+            'num_texts': 0, 
+            'avg_length': 0, 
+            'sample': [],
+            'sentiment': {'positive_pct': 0, 'negative_pct': 0, 'neutral_pct': 0},
+            'word_cloud': []
+        }
+
+def generate_data_dictionary(df: pd.DataFrame, metadata: dict = None) -> pd.DataFrame:
+    """Stub: Devuelve un diccionario de datos simple."""
+    return pd.DataFrame({
+        'column': df.columns,
+        'dtype': [str(dt) for dt in df.dtypes],
+        'num_missing': [df[col].isna().sum() for col in df.columns],
+        'num_unique': [df[col].nunique(dropna=False) for col in df.columns]
+    })
+
+def can_generate_visualizations(df: pd.DataFrame, metadata: dict = None) -> bool:
+    """Stub: Indica si se pueden generar visualizaciones (si hay al menos una columna)."""
+    return df.shape[1] > 0

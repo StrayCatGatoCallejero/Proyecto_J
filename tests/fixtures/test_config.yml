@@ -1,0 +1,47 @@
+# Configuración de prueba para tests
+input:
+  path: "tests/fixtures/sample_data.csv"
+  format: "csv"
+  encoding: "utf-8"
+
+processing:
+  clean_data: true
+  validate_types: true
+  handle_missing: true
+  remove_duplicates: true
+
+analysis:
+  descriptive: true
+  correlation: true
+  clustering: true
+  regression: true
+
+visualization:
+  charts: true
+  interactive: true
+  theme: "plotly_white"
+
+output:
+  format: "pdf"
+  path: "tests/fixtures/expected_outputs/"
+  include_charts: true
+  include_tables: true
+
+logging:
+  level: "INFO"
+  format: "json"
+  file: "tests/fixtures/test.log"
+
+validation:
+  chile_data: true
+  geographic: true
+  demographic: true
+
+nl_queries:
+  enabled: true
+  language: "es"
+  confidence_threshold: 0.7
+
+export:
+  formats: ["csv", "excel", "pdf"]
+  include_metadata: true 

@@ -1,0 +1,267 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "proyecto-j"
+version = "2.0.0"
+description = "Sistema de Análisis de Datos para Ciencias Sociales"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "Proyecto J Team", email = "team@proyectoj.com"}
+]
+maintainers = [
+    {name = "Proyecto J Team", email = "team@proyectoj.com"}
+]
+keywords = ["data-science", "social-sciences", "statistics", "visualization", "streamlit"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Scientific/Engineering :: Information Analysis",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+requires-python = ">=3.8"
+dependencies = [
+    # Core Data Science
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "scipy>=1.16.0",
+    
+    # Visualization
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "plotly>=5.15.0",
+    "missingno>=0.5.0",
+    
+    # Streamlit and Web
+    "streamlit>=1.28.0",
+    "streamlit-option-menu>=0.3.6",
+    
+    # Statistical Analysis
+    "statsmodels>=0.14.0",
+    "scikit-learn>=1.3.0",
+    
+    # Data Loading
+    "openpyxl>=3.1.0",
+    "xlrd>=2.0.0",
+    
+    # Time Series Analysis
+    "statsmodels>=0.14.0",
+    
+    # Data Processing
+    "python-dateutil>=2.8.0",
+    "pytz>=2023.3",
+    
+    # Utilities
+    "chardet>=5.0.0",
+    "pyyaml>=6.0",
+    
+    # PDF Generation
+    "fpdf2>=2.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+    "mypy>=1.5.0",
+    "pre-commit>=3.0.0",
+]
+docs = [
+    "sphinx>=7.0.0",
+    "sphinx-rtd-theme>=1.3.0",
+]
+notebooks = [
+    "jupyter>=1.0.0",
+    "ipykernel>=6.0.0",
+]
+spss = [
+    "pyreadstat>=1.2.0",
+]
+advanced = [
+    "tensorflow>=2.13.0",
+    "torch>=2.0.0",
+    "transformers>=4.30.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/tu-usuario/Proyecto_J"
+Documentation = "https://proyectoj.readthedocs.io"
+Repository = "https://github.com/tu-usuario/Proyecto_J.git"
+"Bug Tracker" = "https://github.com/tu-usuario/Proyecto_J/issues"
+
+[project.scripts]
+proyecto-j = "proyecto_j.src.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["proyecto_j*", "processing*", "orchestrator*"]
+exclude = ["tests*", "examples*", "docs*", "scripts*"]
+
+[tool.setuptools.package-data]
+"proyecto_j" = ["data/*", "config/*"]
+"processing" = ["*.yml", "*.yaml"]
+
+[tool.black]
+line-length = 127
+target-version = ['py38', 'py39', 'py310', 'py311']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+  # directories
+  \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | build
+  | dist
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 127
+multi_line_output = 3
+include_trailing_comma = true
+force_grid_wrap = 0
+use_parentheses = true
+ensure_newline_before_comments = true
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+disallow_untyped_decorators = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+strict_equality = true
+ignore_missing_imports = true
+
+[[tool.mypy.overrides]]
+module = [
+    "pandas.*",
+    "numpy.*",
+    "scipy.*",
+    "sklearn.*",
+    "matplotlib.*",
+    "plotly.*",
+    "streamlit.*",
+    "yaml.*",
+    "chardet.*",
+    "wordcloud.*",
+    "playwright.*"
+]
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --strict-markers --strict-config"
+testpaths = ["tests"]
+python_files = ["test_*.py", "*_test.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
+    "e2e: marks tests as end-to-end tests",
+    "unit: marks tests as unit tests",
+]
+
+[tool.coverage.run]
+source = ["proyecto_j", "processing", "orchestrator"]
+omit = [
+    "*/tests/*",
+    "*/test_*",
+    "*/__pycache__/*",
+    "*/venv/*",
+    "*/.venv/*",
+    "*/examples/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "if self.debug:",
+    "if settings.DEBUG",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if 0:",
+    "if __name__ == .__main__.:",
+    "class .*\\bProtocol\\):",
+    "@(abc\\.)?abstractmethod",
+]
+
+[tool.coverage.html]
+directory = "tests/coverage_html"
+
+[tool.flake8]
+max-line-length = 127
+max-complexity = 10
+exclude = [
+    ".git",
+    "__pycache__",
+    ".venv",
+    "venv",
+    ".pytest_cache",
+    "build",
+    "dist",
+    "*.egg-info",
+]
+ignore = [
+    "E203",
+    "W503",
+    "E501",
+]
+per-file-ignores = [
+    "__init__.py:F401",
+    "tests/*:F401",
+]
+
+[tool.pre-commit]
+repos = [
+    {
+        repo = "https://github.com/pre-commit/pre-commit-hooks",
+        rev = "v4.4.0",
+        hooks = [
+            {id = "trailing-whitespace"},
+            {id = "end-of-file-fixer"},
+            {id = "check-yaml"},
+            {id = "check-added-large-files"},
+            {id = "check-merge-conflict"},
+        ],
+    },
+    {
+        repo = "https://github.com/psf/black",
+        rev = "23.3.0",
+        hooks = [{id = "black"}],
+    },
+    {
+        repo = "https://github.com/pycqa/isort",
+        rev = "5.12.0",
+        hooks = [{id = "isort"}],
+    },
+    {
+        repo = "https://github.com/pycqa/flake8",
+        rev = "6.0.0",
+        hooks = [{id = "flake8"}],
+    },
+]

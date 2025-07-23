@@ -1,0 +1,17 @@
+edad,ingresos,genero,region,educacion,satisfaccion
+25,30000,M,RM,Basica,7
+30,45000,F,Valparaiso,Media,8
+35,55000,M,Bio Bio,Superior,6
+40,65000,F,RM,Superior,9
+45,75000,M,Valparaiso,Media,7
+50,85000,F,Bio Bio,Superior,8
+55,95000,M,RM,Basica,6
+60,105000,F,Valparaiso,Media,9
+28,35000,M,Maule,Superior,8
+32,48000,F,Araucania,Media,7
+38,58000,M,RM,Superior,9
+42,68000,F,Valparaiso,Basica,6
+47,78000,M,Bio Bio,Superior,8
+52,88000,F,Maule,Media,7
+58,98000,M,Araucania,Superior,9
+63,108000,F,RM,Basica,6 

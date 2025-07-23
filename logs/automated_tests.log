@@ -1,0 +1,70 @@
+[2025-07-08 17:42:16] INFO: 🚀 Iniciando ejecución automática de pruebas
+[2025-07-08 17:42:16] INFO: 🧪 Verificando dependencias críticas
+[2025-07-08 17:42:27] INFO: ✅ pandas - DISPONIBLE
+[2025-07-08 17:42:27] INFO: ✅ numpy - DISPONIBLE
+[2025-07-08 17:42:34] INFO: ✅ streamlit - DISPONIBLE
+[2025-07-08 17:42:34] INFO: ✅ plotly - DISPONIBLE
+[2025-07-08 17:42:37] INFO: ✅ matplotlib - DISPONIBLE
+[2025-07-08 17:43:01] INFO: ✅ seaborn - DISPONIBLE
+[2025-07-08 17:43:01] INFO: ✅ chardet - DISPONIBLE
+[2025-07-08 17:43:02] INFO: ✅ openpyxl - DISPONIBLE
+[2025-07-08 17:43:03] INFO: ✅ pyreadstat - DISPONIBLE
+[2025-07-08 17:43:03] INFO: 🧪 Verificando calidad del código
+[2025-07-08 17:43:03] INFO: ✅ Calidad del código - EXITOSO
+[2025-07-08 17:43:03] INFO: 🧪 Verificando imports de la aplicación Streamlit
+[2025-07-08 17:43:17] INFO: ✅ Imports de Streamlit - EXITOSO
+[2025-07-08 17:43:17] INFO: 🧪 Simulando carga de datos
+[2025-07-08 17:43:17] INFO: ❌ Simulación de carga de datos - FALLÓ: [WinError 32] El proceso no tiene acceso al archivo porque está siendo utilizado por otro proceso: 'C:\\Users\\StrayCat\\AppData\\Local\\Temp\\tmp5c1m6jl6.csv'
+[2025-07-08 17:43:17] INFO: 🧪 Iniciando pruebas de carga de archivos
+[2025-07-08 17:43:17] INFO: Ejecutando: Pruebas de integración de carga de archivos
+[2025-07-08 17:43:46] INFO: ❌ Pruebas de integración de carga de archivos - FALLÓ
+[2025-07-08 17:43:46] INFO: Error: ============================= test session starts =============================
+platform win32 -- Python 3.13.1, pytest-8.4.1, pluggy-1.6.0 -- C:\Python313\python.exe
+cachedir: .pytest_cache
+rootdir: C:\Users\StrayCat\Documents\Proyecto_J\tests
+configfile: pytest.ini
+collecting ... collected 9 items
+
+tests\test_file_upload_integration.py::TestFileUploadIntegration::test_csv_utf8_loading PASSED [ 11%]
+tests\test_file_upload_integration.py::TestFileUploadIntegration::test_csv_latin1_loading PASSED [ 22%]
+tests\test_file_upload_integration.py::TestFileUploadIntegration::test_excel_loading PASSED [ 33%]
+tests\test_file_upload_integration.py::TestFileUploadIntegration::test_invalid_file_handling PASSED [ 44%]
+tests\test_file_upload_integration.py::TestFileUploadIntegration::test_none_file_handling PASSED [ 55%]
+tests\test_file_upload_integration.py::TestFileUploadIntegration::test_corrupted_csv_handling FAILED [ 66%]
+tests\test_file_upload_integration.py::TestFileUploadUnit::test_file_extension_detection PASSED [ 77%]
+tests\test_file_upload_integration.py::TestFileUploadUnit::test_encoding_detection FAILED [ 88%]
+tests\test_file_upload_integration.py::TestFileUploadUnit::test_pandas_loading_methods FAILED [100%]
+
+================================== FAILURES ===================================
+____________ TestFileUploadIntegration.test_corrupted_csv_handling ____________
+tests\test_file_upload_integration.py:201: in test_corrupted_csv_handling
+    mock_warning.assert_called()  # Debería mostrar advertencias sobre encoding
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Python313\Lib\unittest\mock.py:946: in assert_called
+    raise AssertionError(msg)
+E   AssertionError: Expected 'warning' to have been called.
+_________________ TestFileUploadUnit.test_encoding_detection __________________
+tests\test_file_upload_integration.py:240: in test_encoding_detection
+    assert result['encoding'] in ['iso-8859-1', 'latin-1']
+E   AssertionError: assert 'ISO-8859-7' in ['iso-8859-1', 'latin-1']
+_______________ TestFileUploadUnit.test_pandas_loading_methods ________________
+tests\test_file_upload_integration.py:258: in test_pandas_loading_methods
+    os.unlink(f.name)
+E   PermissionError: [WinError 32] El proceso no tiene acceso al archivo porque está siendo utilizado por otro proceso: 'C:\\Users\\StrayCat\\AppData\\Local\\Temp\\tmpayyi_gf7.csv'
+=========================== short test summary info ===========================
+FAILED tests\test_file_upload_integration.py::TestFileUploadIntegration::test_corrupted_csv_handling
+FAILED tests\test_file_upload_integration.py::TestFileUploadUnit::test_encoding_detection
+FAILED tests\test_file_upload_integration.py::TestFileUploadUnit::test_pandas_loading_methods
+======================== 3 failed, 6 passed in 19.48s =========================
+
+[2025-07-08 17:43:46] INFO: 💾 Resultados guardados en C:\Users\StrayCat\Documents\Proyecto_J\logs\test_results.json
+[2025-07-08 17:43:46] INFO: ============================================================
+[2025-07-08 17:43:46] INFO: 📊 RESUMEN DE PRUEBAS AUTOMATIZADAS
+[2025-07-08 17:43:46] INFO: ============================================================
+[2025-07-08 17:43:46] INFO: 📅 Fecha: 2025-07-08T17:42:16.607196
+[2025-07-08 17:43:46] INFO: 📈 Total de pruebas: 5
+[2025-07-08 17:43:46] INFO: ✅ Exitosas: 3
+[2025-07-08 17:43:46] INFO: ❌ Fallidas: 2
+[2025-07-08 17:43:46] INFO: ⏭️ Omitidas: 0
+[2025-07-08 17:43:46] INFO: ⚠️ 2 prueba(s) fallaron
+[2025-07-08 17:43:46] INFO: ============================================================

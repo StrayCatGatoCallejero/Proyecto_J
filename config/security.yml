@@ -1,0 +1,329 @@
+# Configuración de Seguridad - Proyecto J
+# Archivo de configuración centralizada para todas las configuraciones de seguridad
+
+# Configuración general de seguridad
+security:
+  # Configuración de validación de datos
+  validation:
+    # Tamaño máximo de archivo (en bytes)
+    max_file_size: 104857600  # 100MB
+    
+    # Tipos de archivo permitidos
+    allowed_extensions:
+      - .csv
+      - .xlsx
+      - .xls
+      - .json
+      - .parquet
+      - .sav
+      - .rds
+    
+    # Configuración de encoding
+    default_encoding: utf-8
+    fallback_encodings:
+      - latin-1
+      - cp1252
+      - iso-8859-1
+    
+    # Límites de memoria
+    max_memory_usage: 1073741824  # 1GB
+    
+    # Timeout para operaciones
+    operation_timeout: 300  # 5 minutos
+
+  # Patrones de validación de seguridad
+  patterns:
+    # Patrones de SQL injection
+    sql_injection_patterns:
+      - "';"
+      - "';--"
+      - "';/*"
+      - "';#"
+      - "';--"
+      - "';/*"
+      - "';#"
+      - "';--"
+      - "';/*"
+      - "';#"
+    
+    # Patrones de XSS
+    xss_patterns:
+      - "<script"
+      - "javascript:"
+      - "onload="
+      - "onerror="
+      - "onclick="
+      - "onmouseover="
+    
+    # Patrones de script injection
+    script_injection_patterns:
+      - "eval("
+      - "exec("
+      - "system("
+      - "subprocess"
+      - "os.system"
+    
+    # Patrones de path traversal
+    path_traversal_patterns:
+      - "%2e%2e%2f"
+      - "%2e%2e%5c"
+      - "..%2f"
+      - "..%5c"
+
+  # Configuración de logging de seguridad
+  logging:
+    # Nivel de logging para eventos de seguridad
+    security_level: WARNING
+    
+    # Archivo de log de seguridad
+    security_log_file: "logs/security.log"
+    
+    # Formato de timestamp
+    timestamp_format: "%Y-%m-%d %H:%M:%S"
+    
+    # Rotación de logs
+    max_log_size: 10485760  # 10MB
+    backup_count: 5
+
+  # Configuración de rate limiting
+  rate_limiting:
+    # Límite de requests por minuto
+    requests_per_minute: 60
+    
+    # Límite de archivos por sesión
+    files_per_session: 10
+    
+    # Tiempo de bloqueo (en segundos)
+    block_duration: 300  # 5 minutos
+
+  # Configuración de autenticación
+  authentication:
+    # Requerir autenticación para operaciones sensibles
+    require_auth: false
+    
+    # Tiempo de expiración de sesión (en horas)
+    session_timeout: 24
+    
+    # Máximo de intentos de login
+    max_login_attempts: 3
+
+  # Configuración de cifrado
+  encryption:
+    # Algoritmo de hash para datos sensibles
+    hash_algorithm: "sha256"
+    
+    # Salt length para hashing
+    salt_length: 32
+    
+    # Clave de cifrado (debe ser configurada en producción)
+    encryption_key: ""
+
+  # Configuración de compliance
+  compliance:
+    # Cumplimiento GDPR
+    gdpr_compliant: true
+    
+    # Retención de datos (en días)
+    data_retention_days: 90
+    
+    # Anonimización de datos
+    anonymize_data: false
+    
+    # Logging de acceso a datos
+    log_data_access: true
+
+  # Configuración de auditoría
+  audit:
+    # Habilitar auditoría
+    enabled: true
+    
+    # Archivo de auditoría
+    audit_log_file: "logs/audit.log"
+    
+    # Eventos a auditar
+    events_to_audit:
+      - "file_upload"
+      - "data_access"
+      - "data_export"
+      - "configuration_change"
+      - "security_violation"
+
+  # Configuración de backup
+  backup:
+    # Habilitar backup automático
+    enabled: true
+    
+    # Frecuencia de backup (en horas)
+    frequency_hours: 24
+    
+    # Directorio de backup
+    backup_directory: "backups/"
+    
+    # Retención de backups (en días)
+    retention_days: 30
+
+  # Configuración de monitoreo
+  monitoring:
+    # Habilitar monitoreo
+    enabled: true
+    
+    # Métricas a monitorear
+    metrics:
+      - "file_uploads"
+      - "processing_time"
+      - "memory_usage"
+      - "error_rate"
+      - "security_violations"
+    
+    # Umbrales de alerta
+    thresholds:
+      memory_usage_mb: 1024
+      processing_time_seconds: 300
+      error_rate_percent: 5
+
+# Configuración de validación de datos específica
+data_validation:
+  # Validación de columnas
+  columns:
+    # Número máximo de columnas
+    max_columns: 1000
+    
+    # Nombres de columnas prohibidos
+    forbidden_names:
+      - "password"
+      - "secret"
+      - "key"
+      - "token"
+      - "auth"
+    
+    # Patrones de nombres de columnas
+    name_pattern: "^[a-zA-Z_][a-zA-Z0-9_]*$"
+  
+  # Validación de filas
+  rows:
+    # Número máximo de filas
+    max_rows: 1000000
+    
+    # Tamaño máximo de celda
+    max_cell_size: 65536  # 64KB
+  
+  # Validación de tipos de datos
+  data_types:
+    # Tipos permitidos
+    allowed_types:
+      - "object"
+      - "int64"
+      - "float64"
+      - "bool"
+      - "datetime64"
+      - "category"
+    
+    # Conversión automática de tipos
+    auto_convert: true
+    
+    # Manejo de valores nulos
+    handle_nulls: true
+
+# Configuración de procesamiento seguro
+secure_processing:
+  # Sanitización de datos
+  sanitization:
+    # Habilitar sanitización
+    enabled: true
+    
+    # Remover caracteres especiales
+    remove_special_chars: false
+    
+    # Escapar caracteres HTML
+    escape_html: true
+    
+    # Normalizar strings
+    normalize_strings: true
+  
+  # Validación de esquemas
+  schema_validation:
+    # Habilitar validación de esquemas
+    enabled: true
+    
+    # Esquemas predefinidos
+    predefined_schemas:
+      - "chile_demographic"
+      - "survey_data"
+      - "economic_indicators"
+    
+    # Validación estricta
+    strict_validation: false
+    
+    # Reportar errores de validación
+    report_validation_errors: true
+
+# Configuración de exportación segura
+secure_export:
+  # Formatos de exportación permitidos
+  allowed_formats:
+    - "csv"
+    - "xlsx"
+    - "json"
+    - "html"
+    - "png"
+    - "jpg"
+  
+  # Configuración de archivos temporales
+  temp_files:
+    # Directorio temporal
+    temp_directory: "temp/"
+    
+    # Limpieza automática
+    auto_cleanup: true
+    
+    # Tiempo de vida (en horas)
+    lifetime_hours: 24
+  
+  # Configuración de compresión
+  compression:
+    # Habilitar compresión
+    enabled: true
+    
+    # Algoritmo de compresión
+    algorithm: "gzip"
+    
+    # Nivel de compresión (1-9)
+    level: 6
+
+# Configuración de errores y excepciones
+error_handling:
+  # Manejo de errores críticos
+  critical_errors:
+    # Log de errores críticos
+    log_critical: true
+    
+    # Notificación de errores críticos
+    notify_critical: false
+    
+    # Archivo de errores críticos
+    critical_log_file: "logs/critical_errors.log"
+  
+  # Manejo de errores de validación
+  validation_errors:
+    # Continuar con errores de validación
+    continue_on_validation_error: true
+    
+    # Reportar errores de validación
+    report_validation_errors: true
+    
+    # Archivo de errores de validación
+    validation_log_file: "logs/validation_errors.log"
+  
+  # Manejo de errores de procesamiento
+  processing_errors:
+    # Reintentos automáticos
+    auto_retry: true
+    
+    # Número máximo de reintentos
+    max_retries: 3
+    
+    # Tiempo entre reintentos (en segundos)
+    retry_delay: 5
+    
+    # Archivo de errores de procesamiento
+    processing_log_file: "logs/processing_errors.log" 

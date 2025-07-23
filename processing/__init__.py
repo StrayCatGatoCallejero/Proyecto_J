@@ -7,7 +7,7 @@ siguiendo el patrón arquitectónico "Reloj Suizo" con responsabilidades
 bien definidas y separadas.
 """
 
-from .io import cargar_archivo, validar_dataframe, obtener_info_archivo
+from .io import load_csv_safe, load_excel_safe, load_spss_safe, validate_dataframe, get_file_info
 from .stats import (
     summary_statistics,
     compute_correlations,
@@ -18,15 +18,15 @@ from .stats import (
     frequency_table,
     outlier_detection
 )
-from .features import (
-    create_numeric_features,
-    encode_categorical,
-    scale_features,
-    create_interaction_features,
-    select_features,
-    create_time_features,
-    create_binning_features
-)
+# from .features import (
+#     create_numeric_features,
+#     encode_categorical,
+#     scale_features,
+#     create_interaction_features,
+#     select_features,
+#     create_time_features,
+#     create_binning_features
+# )
 from .filters import (
     filter_by_condition,
     filter_by_range,
@@ -70,9 +70,11 @@ from .config_manager import (
 
 __all__ = [
     # IO
-    'cargar_archivo',
-    'validar_dataframe', 
-    'obtener_info_archivo',
+    'load_csv_safe',
+    'load_excel_safe',
+    'load_spss_safe',
+    'validate_dataframe', 
+    'get_file_info',
     
     # Stats
     'summary_statistics',
@@ -85,13 +87,13 @@ __all__ = [
     'outlier_detection',
     
     # Features
-    'create_numeric_features',
-    'encode_categorical',
-    'scale_features',
-    'create_interaction_features',
-    'select_features',
-    'create_time_features',
-    'create_binning_features',
+    # 'create_numeric_features',
+    # 'encode_categorical',
+    # 'scale_features',
+    # 'create_interaction_features',
+    # 'select_features',
+    # 'create_time_features',
+    # 'create_binning_features',
     
     # Filters
     'filter_by_condition',

@@ -47,7 +47,7 @@ git push origin main
 ### 4. Variables de Entorno (Opcional)
 
 Si necesitas configuraciones adicionales:
-- **PYTHON_VERSION**: `3.11.5`
+- **PYTHON_VERSION**: `3.10.12`
 - **DISPLAY**: `:99` (para Kaleido)
 
 ### 5. Desplegar
